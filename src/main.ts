@@ -2,6 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { useSwagger } from './swagger';
 
 import * as _cluster from 'cluster';
 import * as os from 'os';
@@ -21,6 +22,8 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
+
+  if (configService.getOrThrow('NODE_ENV') !== 'production') useSwagger(app);
 
   const origins = ['http://localhost:3000', 'https://localhost:3000'];
 
