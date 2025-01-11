@@ -1,7 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { PostUserDto, PostUserResponseDto } from './dtos/post-user.dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { RequestUser } from 'src/user.decorator';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -14,5 +17,13 @@ export class UsersController {
   async kakaoLogin(@Body() body: PostUserDto) {
     const snsUser = await this.usersService.getKakaoUser(body.snsToken);
     return this.usersService.signInOrUp(body, snsUser);
+  }
+
+  @ApiOperation({ summary: '유저 조회' })
+  @ApiResponse({ type: UserDto })
+  @Get()
+  @UseGuards(JwtGuard)
+  async getUser(@RequestUser() user: UserDto) {
+    return user;
   }
 }

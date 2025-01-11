@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+import { UserDto } from './user.dto';
 
 export class PostUserDto {
   @ApiProperty({ description: 'sns 토큰', type: String })
@@ -15,18 +16,6 @@ export class PostUserDto {
   @IsString()
   @IsOptional()
   nickname: string = '프로틴 쉐이크';
-}
-
-export class UserDto {
-  @ApiProperty({
-    description: '유저 고유 아이디',
-    type: String,
-    required: false,
-  })
-  id: string;
-
-  @ApiProperty({ description: '닉네임', type: String })
-  nickname: string;
 }
 
 export class PostUserResponseDto {
