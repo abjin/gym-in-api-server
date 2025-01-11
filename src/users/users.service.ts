@@ -6,6 +6,7 @@ import { PostUserDto } from './dtos/post-user.dto';
 import { $Enums } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from 'src/auth/auth.service';
+import { PutUserResponseDto } from './dtos/put-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -66,6 +67,13 @@ export class UsersService {
 
       const token = await this.authService.signJwtToken(user);
       return { user, token, isNew: true };
+    });
+  }
+
+  public updateUser(id: string, dto: PutUserResponseDto) {
+    return this.prismaService.users.update({
+      where: { id },
+      data: { nickname: dto.nickname },
     });
   }
 
