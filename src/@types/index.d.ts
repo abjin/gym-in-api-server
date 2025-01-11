@@ -8,3 +8,5 @@ export type KakaoGetUserProfileApiResponse = {
   id: number;
   kakao_account: { profile: { nickname: string } };
 };
+
+export type JwtPayload = { id: string };

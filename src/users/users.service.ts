@@ -3,16 +3,16 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { KakaoGetUserProfileApiResponse, SnsUser } from '@types';
 import { PrismaService } from 'db/prisma.service';
 import { PostUserDto } from './dtos/post-user.dto';
-import { $Enums, Users } from '@prisma/client';
-import { JwtService } from '@nestjs/jwt';
+import { $Enums } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly httpService: HttpService,
     private readonly prismaService: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
   ) {}
 
   public async getKakaoUser(snsToken: string) {
@@ -47,13 +47,13 @@ export class UsersService {
 
   private async signIn(id: string) {
     const user = await this.prismaService.users.findUnique({ where: { id } });
-    const token = await this.generateToken(user);
+    const token = await this.authService.signJwtToken(user);
     return { user, token, isNew: false };
   }
 
   private async signUp(dto: PostUserDto, snsUser: SnsUser) {
     return this.prismaService.$transaction(async (prisma) => {
-      const id = this.generateId();
+      const id = uuidv4();
       const nickname = dto.nickname || snsUser.nickname;
       const user = await prisma.users.create({ data: { id, nickname } });
       await prisma.accounts.create({
@@ -64,17 +64,8 @@ export class UsersService {
         },
       });
 
-      const token = await this.generateToken(user);
-
+      const token = await this.authService.signJwtToken(user);
       return { user, token, isNew: true };
     });
-  }
-
-  private async generateToken(user: Users) {
-    return this.jwtService.signAsync({ id: user.id });
-  }
-
-  private generateId() {
-    return uuidv4();
   }
 }
