@@ -14,5 +14,22 @@ datasource db {
 }
 
 model Users {
-  id    String     @id 
+  id      String     @id
+  nickname String
+  account Accounts[] @relation("userToAccount")
+}
+
+model Accounts {
+  id        String
+  type      AccountType
+  userId    String      @unique
+  createdAt DateTime    @default(now())
+  user      Users       @relation("userToAccount", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([id, type])
+}
+
+enum AccountType {
+  kakao
+  naver
 }
