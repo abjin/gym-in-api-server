@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { PostUserDto, PostUserResponseDto } from './dtos/post-user.dto';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { RequestUser } from 'src/user.decorator';
 import { UserDto } from './dtos/user.dto';
+import { Users } from '@prisma/client';
 
 @Controller('users')
 export class UsersController {
@@ -25,5 +26,13 @@ export class UsersController {
   @UseGuards(JwtGuard)
   async getUser(@RequestUser() user: UserDto) {
     return user;
+  }
+
+  @ApiOperation({ summary: '유저 탈퇴' })
+  @Delete()
+  @ApiResponse({ type: UserDto })
+  @UseGuards(JwtGuard)
+  async deleteUser(@RequestUser() user: Users) {
+    return this.usersService.deleteUser(user.id);
   }
 }

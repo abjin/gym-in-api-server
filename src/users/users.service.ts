@@ -68,4 +68,8 @@ export class UsersService {
       return { user, token, isNew: true };
     });
   }
+
+  public deleteUser(userId: string) {
+    return this.prismaService.users.delete({ where: { id: userId } });
+  }
 }
