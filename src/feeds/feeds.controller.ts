@@ -24,6 +24,8 @@ import {
   GetPresignedUrlResponseDto,
 } from '@libs/s3';
 import {
+  GetCommentsRequestQueryDto,
+  GetCommentsResponseDto,
   GetFeedResponseDto,
   GetFeedsRequestQueryDto,
   GetFeedsResponseDto,
@@ -97,5 +99,15 @@ export class FeedsController {
     @RequestUser() { id: owner }: Users,
   ): Promise<PostCommentsResponseDto> {
     return this.feedsService.createComments({ feedId, content, owner });
+  }
+
+  @Get(':feedId/comments')
+  @ApiOperation({ summary: 'get comments' })
+  @ApiResponse({ type: GetCommentsResponseDto })
+  getComments(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Query() dto: GetCommentsRequestQueryDto,
+  ): Promise<GetCommentsResponseDto> {
+    return this.feedsService.getComments(dto, feedId);
   }
 }

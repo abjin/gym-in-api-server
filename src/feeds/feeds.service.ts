@@ -6,6 +6,7 @@ import {
   PostFeedsResponseDto,
 } from './dtos/post-feeds.dto';
 import {
+  GetCommentsRequestQueryDto,
   GetFeedResponseDto,
   GetFeedsRequestQueryDto,
   GetFeedsResponseDto,
@@ -78,6 +79,17 @@ export class FeedsService {
     return this.prisma.comments.create({
       data: { feedId, owner, content },
       select: this.prisma.commentSelect,
+    });
+  }
+
+  async getComments(dto: GetCommentsRequestQueryDto, feedId: number) {
+    return this.prisma.comments.findMany({
+      where: { feedId },
+      select: this.prisma.commentSelect,
+      take: dto.limit,
+      skip: dto.lastId ? 1 : 0,
+      orderBy: { id: 'desc' },
+      ...(dto.lastId && { cursor: { id: dto.lastId } }),
     });
   }
 }
