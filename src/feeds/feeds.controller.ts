@@ -110,4 +110,15 @@ export class FeedsController {
   ): Promise<GetCommentsResponseDto> {
     return this.feedsService.getComments(dto, feedId);
   }
+
+  @Delete(':feedId/comments/:commentId')
+  @ApiOperation({ summary: 'delete comment' })
+  @ApiResponse({ type: undefined })
+  deleteComment(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @RequestUser() { id: owner }: Users,
+  ): Promise<void> {
+    return this.feedsService.deleteComment({ commentId, feedId, owner });
+  }
 }

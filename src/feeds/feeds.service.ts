@@ -92,4 +92,18 @@ export class FeedsService {
       ...(dto.lastId && { cursor: { id: dto.lastId } }),
     });
   }
+
+  async deleteComment({
+    commentId,
+    feedId,
+    owner,
+  }: {
+    commentId: number;
+    feedId: number;
+    owner: string;
+  }): Promise<void> {
+    await this.prisma.comments.delete({
+      where: { id: commentId, feedId, owner },
+    });
+  }
 }
