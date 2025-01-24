@@ -7,7 +7,12 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { PostUserDto, PostUserResponseDto } from './dtos/post-user.dto';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
@@ -17,6 +22,7 @@ import { Users } from '@prisma/client';
 import { PutUserResponseDto } from './dtos/put-user.dto';
 
 @Controller('users')
+@ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
