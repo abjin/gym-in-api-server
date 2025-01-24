@@ -19,8 +19,18 @@
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
     "paths": {
-      "passport": ["src/@types/passport"],
-      "@types": ["src/@types"]
+      "passport": [
+        "src/@types/passport"
+      ],
+      "@types": [
+        "src/@types"
+      ],
+      "@libs/s3": [
+        "libs/s3/src"
+      ],
+      "@libs/s3/*": [
+        "libs/s3/src/*"
+      ]
     }
   }
 }
