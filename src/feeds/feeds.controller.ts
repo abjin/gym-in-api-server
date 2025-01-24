@@ -14,9 +14,11 @@ import {
   GetPresignedUrlResponseDto,
 } from '@libs/s3';
 import {
+  GetFeedsRequestQueryDto,
+  GetFeedsResponseDto,
   PostFeedsRequestBodyDto,
   PostFeedsResponseDto,
-} from './dtos/post-feeds.dto';
+} from './dtos';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -43,5 +45,14 @@ export class FeedsController {
     @RequestUser() { id }: Users,
   ): Promise<PostFeedsResponseDto> {
     return this.feedsService.createFeeds(id, dto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'get feeds' })
+  @ApiResponse({ type: GetFeedsResponseDto })
+  getFeeds(
+    @Query() dto: GetFeedsRequestQueryDto,
+  ): Promise<GetFeedsResponseDto> {
+    return this.feedsService.getFeeds(dto);
   }
 }

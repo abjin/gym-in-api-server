@@ -5,6 +5,7 @@ import {
   PostFeedsRequestBodyDto,
   PostFeedsResponseDto,
 } from './dtos/post-feeds.dto';
+import { GetFeedsRequestQueryDto, GetFeedsResponseDto } from './dtos';
 
 @Injectable()
 export class FeedsService {
@@ -33,6 +34,19 @@ export class FeedsService {
     return this.prisma.posts.create({
       data: { owner: id, content: dto.content, imageUrls: dto.imageUrls },
       select: this.prisma.postSelect,
+    });
+  }
+
+  async getFeeds({
+    lastId,
+    limit,
+  }: GetFeedsRequestQueryDto): Promise<GetFeedsResponseDto> {
+    return this.prisma.posts.findMany({
+      select: this.prisma.postSelect,
+      take: limit,
+      skip: lastId ? 1 : 0,
+      orderBy: { id: 'desc' },
+      ...(lastId && { cursor: { id: lastId } }),
     });
   }
 }
