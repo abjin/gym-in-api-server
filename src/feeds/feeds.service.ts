@@ -60,4 +60,8 @@ export class FeedsService {
       select: this.prisma.postSelect,
     });
   }
+
+  async deleteFeed(id: number, owner: string): Promise<void> {
+    await this.prisma.posts.delete({ where: { id, owner } });
+  }
 }

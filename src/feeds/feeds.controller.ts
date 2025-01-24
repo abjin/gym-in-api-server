@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -67,11 +68,21 @@ export class FeedsController {
   }
 
   @Get(':feedId')
-  @ApiOperation({ summary: 'get feeds' })
+  @ApiOperation({ summary: 'get feed' })
   @ApiResponse({ type: GetFeedResponseDto })
   getFeed(
     @Param('feedId', ParseIntPipe) feedId: number,
   ): Promise<GetFeedResponseDto> {
     return this.feedsService.getFeed(feedId);
+  }
+
+  @Delete(':feedId')
+  @ApiOperation({ summary: 'delete feed' })
+  @ApiResponse({ type: undefined })
+  deleteFeed(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @RequestUser() { id: owner }: Users,
+  ): Promise<void> {
+    return this.feedsService.deleteFeed(feedId, owner);
   }
 }
