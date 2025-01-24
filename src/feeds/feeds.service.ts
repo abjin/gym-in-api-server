@@ -12,6 +12,7 @@ import {
   GetFeedsResponseDto,
   PostCommentsResponseDto,
 } from './dtos';
+import { PostFeedLikesResponseDto } from './dtos/post-feed-likes.dto';
 
 @Injectable()
 export class FeedsService {
@@ -104,6 +105,14 @@ export class FeedsService {
   }): Promise<void> {
     await this.prisma.comments.delete({
       where: { id: commentId, feedId, owner },
+    });
+  }
+
+  async likeFeed(feedId: number): Promise<PostFeedLikesResponseDto> {
+    return this.prisma.posts.update({
+      where: { id: feedId },
+      select: { likeCounts: true },
+      data: { likeCounts: { increment: 1 } },
     });
   }
 }

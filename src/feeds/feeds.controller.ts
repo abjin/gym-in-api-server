@@ -34,6 +34,7 @@ import {
   PostFeedsRequestBodyDto,
   PostFeedsResponseDto,
 } from './dtos';
+import { PostFeedLikesResponseDto } from './dtos/post-feed-likes.dto';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -120,5 +121,14 @@ export class FeedsController {
     @RequestUser() { id: owner }: Users,
   ): Promise<void> {
     return this.feedsService.deleteComment({ commentId, feedId, owner });
+  }
+
+  @Post(':feedId/likes')
+  @ApiOperation({ summary: 'like feed' })
+  @ApiResponse({ type: undefined })
+  likeFeed(
+    @Param('feedId', ParseIntPipe) feedId: number,
+  ): Promise<PostFeedLikesResponseDto> {
+    return this.feedsService.likeFeed(feedId);
   }
 }

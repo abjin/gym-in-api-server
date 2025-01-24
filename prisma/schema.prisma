@@ -38,7 +38,7 @@ model Posts {
   imageUrls     Json
   createdAt     DateTime   @default(now())
   commentCounts Int        @default(0)
-  likesCounts   Int        @default(0)
+  likeCounts   Int        @default(0)
   comments      Comments[] @relation("feedToComment")
   author        Users      @relation("userToPost", fields: [owner], references: [id])
 }

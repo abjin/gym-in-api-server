@@ -21,7 +21,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     imageUrls: true,
     createdAt: true,
     commentCounts: true,
-    likesCounts: true,
+    likeCounts: true,
     author: true,
   };
 

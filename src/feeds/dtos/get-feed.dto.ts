@@ -23,7 +23,7 @@ export class GetFeedResponseDto {
   commentCounts: number;
 
   @ApiProperty({ description: '좋아요수', type: Number })
-  likesCounts: number;
+  likeCounts: number;
 
   @ApiProperty({ description: '작성자', type: UserDto })
   author: Users;
