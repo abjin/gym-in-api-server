@@ -5,7 +5,11 @@ import {
   PostFeedsRequestBodyDto,
   PostFeedsResponseDto,
 } from './dtos/post-feeds.dto';
-import { GetFeedsRequestQueryDto, GetFeedsResponseDto } from './dtos';
+import {
+  GetFeedResponseDto,
+  GetFeedsRequestQueryDto,
+  GetFeedsResponseDto,
+} from './dtos';
 
 @Injectable()
 export class FeedsService {
@@ -47,6 +51,13 @@ export class FeedsService {
       skip: lastId ? 1 : 0,
       orderBy: { id: 'desc' },
       ...(lastId && { cursor: { id: lastId } }),
+    });
+  }
+
+  async getFeed(id: number): Promise<GetFeedResponseDto> {
+    return this.prisma.posts.findFirst({
+      where: { id },
+      select: this.prisma.postSelect,
     });
   }
 }

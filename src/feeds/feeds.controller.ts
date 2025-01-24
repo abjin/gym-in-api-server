@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { FeedsService } from './feeds.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import {
@@ -14,6 +23,7 @@ import {
   GetPresignedUrlResponseDto,
 } from '@libs/s3';
 import {
+  GetFeedResponseDto,
   GetFeedsRequestQueryDto,
   GetFeedsResponseDto,
   PostFeedsRequestBodyDto,
@@ -54,5 +64,14 @@ export class FeedsController {
     @Query() dto: GetFeedsRequestQueryDto,
   ): Promise<GetFeedsResponseDto> {
     return this.feedsService.getFeeds(dto);
+  }
+
+  @Get(':feedId')
+  @ApiOperation({ summary: 'get feeds' })
+  @ApiResponse({ type: GetFeedResponseDto })
+  getFeed(
+    @Param('feedId', ParseIntPipe) feedId: number,
+  ): Promise<GetFeedResponseDto> {
+    return this.feedsService.getFeed(feedId);
   }
 }
