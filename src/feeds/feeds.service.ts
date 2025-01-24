@@ -1,9 +1,17 @@
 import { S3Service } from '@libs/s3';
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'db/prisma.service';
+import {
+  PostFeedsRequestBodyDto,
+  PostFeedsResponseDto,
+} from './dtos/post-feeds.dto';
 
 @Injectable()
 export class FeedsService {
-  constructor(private readonly s3Service: S3Service) {}
+  constructor(
+    private readonly s3Service: S3Service,
+    private readonly prisma: PrismaService,
+  ) {}
 
   getPreSignedUrls(userId: string, count = 1) {
     const ts = Date.now();
@@ -16,5 +24,15 @@ export class FeedsService {
     }
 
     return result;
+  }
+
+  async createFeeds(
+    id: string,
+    dto: PostFeedsRequestBodyDto,
+  ): Promise<PostFeedsResponseDto> {
+    return this.prisma.posts.create({
+      data: { owner: id, content: dto.content, imageUrls: dto.imageUrls },
+      select: this.prisma.postSelect,
+    });
   }
 }

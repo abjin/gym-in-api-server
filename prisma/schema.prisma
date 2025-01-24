@@ -14,9 +14,10 @@ datasource db {
 }
 
 model Users {
-  id      String     @id
+  id       String     @id
   nickname String
-  account Accounts[] @relation("userToAccount")
+  accounts Accounts[] @relation("userToAccount")
+  posts    Posts[]    @relation("userToPost")
 }
 
 model Accounts {
@@ -27,6 +28,17 @@ model Accounts {
   user      Users       @relation("userToAccount", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([id, type])
+}
+
+model Posts {
+  id            Int      @id @default(autoincrement())
+  owner         String
+  content       String
+  imageUrls     Json
+  createdAt     DateTime @default(now())
+  commentCounts Int      @default(0)
+  likesCounts   Int      @default(0)
+  author        Users    @relation("userToPost", fields: [owner], references: [id])
 }
 
 enum AccountType {
