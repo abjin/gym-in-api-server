@@ -18,6 +18,7 @@ model Users {
   nickname String
   accounts Accounts[] @relation("userToAccount")
   posts    Posts[]    @relation("userToPost")
+  comments Comments[] @relation("userToComment")
 }
 
 model Accounts {
@@ -31,14 +32,25 @@ model Accounts {
 }
 
 model Posts {
-  id            Int      @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   owner         String
   content       String
   imageUrls     Json
-  createdAt     DateTime @default(now())
-  commentCounts Int      @default(0)
-  likesCounts   Int      @default(0)
-  author        Users    @relation("userToPost", fields: [owner], references: [id])
+  createdAt     DateTime   @default(now())
+  commentCounts Int        @default(0)
+  likesCounts   Int        @default(0)
+  comments      Comments[] @relation("feedToComment")
+  author        Users      @relation("userToPost", fields: [owner], references: [id])
+}
+
+model Comments {
+  id         Int    @id @default(autoincrement())
+  feedId     Int
+  owner      String
+  content    String
+  likeCounts Int    @default(0)
+  author     Users  @relation("userToComment", fields: [owner], references: [id])
+  feed       Posts  @relation("feedToComment", fields: [feedId], references: [id])
 }
 
 enum AccountType {

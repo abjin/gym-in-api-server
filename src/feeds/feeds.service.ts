@@ -9,6 +9,7 @@ import {
   GetFeedResponseDto,
   GetFeedsRequestQueryDto,
   GetFeedsResponseDto,
+  PostCommentsResponseDto,
 } from './dtos';
 
 @Injectable()
@@ -63,5 +64,20 @@ export class FeedsService {
 
   async deleteFeed(id: number, owner: string): Promise<void> {
     await this.prisma.posts.delete({ where: { id, owner } });
+  }
+
+  async createComments({
+    feedId,
+    owner,
+    content,
+  }: {
+    feedId: number;
+    owner: string;
+    content: string;
+  }): Promise<PostCommentsResponseDto> {
+    return this.prisma.comments.create({
+      data: { feedId, owner, content },
+      select: this.prisma.commentSelect,
+    });
   }
 }

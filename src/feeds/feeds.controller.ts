@@ -27,6 +27,8 @@ import {
   GetFeedResponseDto,
   GetFeedsRequestQueryDto,
   GetFeedsResponseDto,
+  PostCommentsRequestBodyDto,
+  PostCommentsResponseDto,
   PostFeedsRequestBodyDto,
   PostFeedsResponseDto,
 } from './dtos';
@@ -84,5 +86,16 @@ export class FeedsController {
     @RequestUser() { id: owner }: Users,
   ): Promise<void> {
     return this.feedsService.deleteFeed(feedId, owner);
+  }
+
+  @Post(':feedId/comments')
+  @ApiOperation({ summary: 'create comment' })
+  @ApiResponse({ type: PostCommentsResponseDto })
+  createComment(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Body() { content }: PostCommentsRequestBodyDto,
+    @RequestUser() { id: owner }: Users,
+  ): Promise<PostCommentsResponseDto> {
+    return this.feedsService.createComments({ feedId, content, owner });
   }
 }

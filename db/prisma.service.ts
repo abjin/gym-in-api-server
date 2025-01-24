@@ -24,4 +24,13 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     likesCounts: true,
     author: true,
   };
+
+  public readonly commentSelect = {
+    id: true,
+    feedId: true,
+    owner: true,
+    content: true,
+    likeCounts: true,
+    author: true,
+  };
 }
