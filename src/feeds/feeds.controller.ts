@@ -72,6 +72,17 @@ export class FeedsController {
     return this.feedsService.getFeeds(dto);
   }
 
+  @Get('my')
+  @Get(':feedId')
+  @ApiOperation({ summary: 'get my feed' })
+  @ApiResponse({ type: GetFeedsResponseDto })
+  getMyFeeds(
+    @Query() dto: GetFeedsRequestQueryDto,
+    @RequestUser() { id: owner }: Users,
+  ): Promise<GetFeedsResponseDto> {
+    return this.feedsService.getMyFeeds(owner, dto);
+  }
+
   @Get(':feedId')
   @ApiOperation({ summary: 'get feed' })
   @ApiResponse({ type: GetFeedResponseDto })

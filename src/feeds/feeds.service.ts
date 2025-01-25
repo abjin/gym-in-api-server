@@ -143,4 +143,15 @@ export class FeedsService {
       data: { likeCounts: { decrement: 1 } },
     });
   }
+
+  async getMyFeeds(userId: string, dto: GetFeedsRequestQueryDto) {
+    return this.prisma.feeds.findMany({
+      where: { owner: userId },
+      select: this.prisma.feedSelect,
+      take: dto.limit,
+      skip: dto.lastId ? 1 : 0,
+      orderBy: { id: 'desc' },
+      ...(dto.lastId && { cursor: { id: dto.lastId } }),
+    });
+  }
 }
