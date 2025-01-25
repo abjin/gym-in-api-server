@@ -74,8 +74,7 @@ export class FeedsController {
   }
 
   @Get('my')
-  @Get(':feedId')
-  @ApiOperation({ summary: 'get my feed' })
+  @ApiOperation({ summary: 'get my feeds' })
   @ApiResponse({ type: GetFeedsResponseDto })
   getMyFeeds(
     @Query() dto: GetFeedsRequestQueryDto,
@@ -85,8 +84,7 @@ export class FeedsController {
   }
 
   @Get('my/counts')
-  @Get(':feedId')
-  @ApiOperation({ summary: 'get my feed' })
+  @ApiOperation({ summary: 'get my feeds counts' })
   @ApiResponse({ type: GetCountsResponseDto })
   getMyFeedsCounts(
     @RequestUser() { id: owner }: Users,
@@ -105,8 +103,7 @@ export class FeedsController {
   }
 
   @Get('my/comments/counts')
-  @Get(':feedId')
-  @ApiOperation({ summary: 'get my feed' })
+  @ApiOperation({ summary: 'get my comments count' })
   @ApiResponse({ type: GetCountsResponseDto })
   getMyCommentsCounts(
     @RequestUser() { id: owner }: Users,
