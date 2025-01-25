@@ -165,4 +165,15 @@ export class FeedsService {
     });
     return { count };
   }
+
+  async getMyComments(dto: GetCommentsRequestQueryDto, owner: string) {
+    return this.prisma.comments.findMany({
+      where: { owner },
+      select: this.prisma.commentSelect,
+      take: dto.limit,
+      skip: dto.lastId ? 1 : 0,
+      orderBy: { id: 'desc' },
+      ...(dto.lastId && { cursor: { id: dto.lastId } }),
+    });
+  }
 }

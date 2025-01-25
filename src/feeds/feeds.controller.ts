@@ -94,6 +94,16 @@ export class FeedsController {
     return this.feedsService.getMyFeedsCounts(owner);
   }
 
+  @Get('my/comments')
+  @ApiOperation({ summary: 'get my comments' })
+  @ApiResponse({ type: GetCommentsResponseDto })
+  getMyComments(
+    @RequestUser() { id: owner }: Users,
+    @Query() dto: GetCommentsRequestQueryDto,
+  ): Promise<GetCommentsResponseDto> {
+    return this.feedsService.getMyComments(dto, owner);
+  }
+
   @Get(':feedId')
   @ApiOperation({ summary: 'get feed' })
   @ApiResponse({ type: GetFeedResponseDto })
