@@ -1,5 +1,5 @@
 import { S3Service } from '@libs/s3';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'db/prisma.service';
 import {
   PostFeedsRequestBodyDto,
@@ -108,7 +108,16 @@ export class FeedsService {
     });
   }
 
-  async likeFeed(feedId: number): Promise<PostFeedLikesResponseDto> {
+  async likeFeed(
+    feedId: number,
+    userId: string,
+  ): Promise<PostFeedLikesResponseDto> {
+    const likes = await this.prisma.feedLikes.findUnique({
+      where: { feedId_userId: { feedId, userId } },
+    });
+
+    if (likes) throw new ConflictException('Already liked');
+
     return this.prisma.feeds.update({
       where: { id: feedId },
       select: { likeCounts: true },
@@ -116,7 +125,11 @@ export class FeedsService {
     });
   }
 
-  async unlikeFeed(feedId: number) {
+  async unlikeFeed(feedId: number, userId: string): Promise<void> {
+    await this.prisma.feedLikes.delete({
+      where: { feedId_userId: { feedId, userId } },
+    });
+
     await this.prisma.feeds.update({
       where: { id: feedId },
       select: { likeCounts: true },

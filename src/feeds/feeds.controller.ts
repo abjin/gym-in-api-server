@@ -128,14 +128,18 @@ export class FeedsController {
   @ApiResponse({ type: PostFeedLikesResponseDto })
   likeFeed(
     @Param('feedId', ParseIntPipe) feedId: number,
+    @RequestUser() { id: userId }: Users,
   ): Promise<PostFeedLikesResponseDto> {
-    return this.feedsService.likeFeed(feedId);
+    return this.feedsService.likeFeed(feedId, userId);
   }
 
   @Delete(':feedId/likes')
   @ApiOperation({ summary: 'unlike feed' })
   @ApiResponse({ type: undefined })
-  unlikeFeed(@Param('feedId', ParseIntPipe) feedId: number): Promise<void> {
-    return this.feedsService.unlikeFeed(feedId);
+  unlikeFeed(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @RequestUser() { id: userId }: Users,
+  ): Promise<void> {
+    return this.feedsService.unlikeFeed(feedId, userId);
   }
 }
