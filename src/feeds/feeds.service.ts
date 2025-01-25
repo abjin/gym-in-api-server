@@ -38,9 +38,9 @@ export class FeedsService {
     id: string,
     dto: PostFeedsRequestBodyDto,
   ): Promise<PostFeedsResponseDto> {
-    return this.prisma.posts.create({
+    return this.prisma.feeds.create({
       data: { owner: id, content: dto.content, imageUrls: dto.imageUrls },
-      select: this.prisma.postSelect,
+      select: this.prisma.feedSelect,
     });
   }
 
@@ -48,8 +48,8 @@ export class FeedsService {
     lastId,
     limit,
   }: GetFeedsRequestQueryDto): Promise<GetFeedsResponseDto> {
-    return this.prisma.posts.findMany({
-      select: this.prisma.postSelect,
+    return this.prisma.feeds.findMany({
+      select: this.prisma.feedSelect,
       take: limit,
       skip: lastId ? 1 : 0,
       orderBy: { id: 'desc' },
@@ -58,14 +58,14 @@ export class FeedsService {
   }
 
   async getFeed(id: number): Promise<GetFeedResponseDto> {
-    return this.prisma.posts.findFirst({
+    return this.prisma.feeds.findFirst({
       where: { id },
-      select: this.prisma.postSelect,
+      select: this.prisma.feedSelect,
     });
   }
 
   async deleteFeed(id: number, owner: string): Promise<void> {
-    await this.prisma.posts.delete({ where: { id, owner } });
+    await this.prisma.feeds.delete({ where: { id, owner } });
   }
 
   async createComments({
@@ -109,7 +109,7 @@ export class FeedsService {
   }
 
   async likeFeed(feedId: number): Promise<PostFeedLikesResponseDto> {
-    return this.prisma.posts.update({
+    return this.prisma.feeds.update({
       where: { id: feedId },
       select: { likeCounts: true },
       data: { likeCounts: { increment: 1 } },
@@ -117,7 +117,7 @@ export class FeedsService {
   }
 
   async unlikeFeed(feedId: number) {
-    await this.prisma.posts.update({
+    await this.prisma.feeds.update({
       where: { id: feedId },
       select: { likeCounts: true },
       data: { likeCounts: { decrement: 1 } },
