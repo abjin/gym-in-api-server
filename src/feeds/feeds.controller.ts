@@ -33,8 +33,8 @@ import {
   PostCommentsResponseDto,
   PostFeedsRequestBodyDto,
   PostFeedsResponseDto,
+  PostFeedLikesResponseDto,
 } from './dtos';
-import { PostFeedLikesResponseDto } from './dtos/post-feed-likes.dto';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -125,10 +125,17 @@ export class FeedsController {
 
   @Post(':feedId/likes')
   @ApiOperation({ summary: 'like feed' })
-  @ApiResponse({ type: undefined })
+  @ApiResponse({ type: PostFeedLikesResponseDto })
   likeFeed(
     @Param('feedId', ParseIntPipe) feedId: number,
   ): Promise<PostFeedLikesResponseDto> {
     return this.feedsService.likeFeed(feedId);
+  }
+
+  @Delete(':feedId/likes')
+  @ApiOperation({ summary: 'unlike feed' })
+  @ApiResponse({ type: undefined })
+  unlikeFeed(@Param('feedId', ParseIntPipe) feedId: number): Promise<void> {
+    return this.feedsService.unlikeFeed(feedId);
   }
 }

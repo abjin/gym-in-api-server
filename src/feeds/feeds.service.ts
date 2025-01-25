@@ -115,4 +115,12 @@ export class FeedsService {
       data: { likeCounts: { increment: 1 } },
     });
   }
+
+  async unlikeFeed(feedId: number) {
+    await this.prisma.posts.update({
+      where: { id: feedId },
+      select: { likeCounts: true },
+      data: { likeCounts: { decrement: 1 } },
+    });
+  }
 }
