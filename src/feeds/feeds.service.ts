@@ -118,11 +118,18 @@ export class FeedsService {
 
     if (likes) throw new ConflictException('Already liked');
 
-    return this.prisma.feeds.update({
-      where: { id: feedId },
-      select: { likeCounts: true },
-      data: { likeCounts: { increment: 1 } },
-    });
+    const result = await Promise.all([
+      this.prisma.feeds.update({
+        where: { id: feedId },
+        select: { likeCounts: true },
+        data: { likeCounts: { increment: 1 } },
+      }),
+      this.prisma.feedLikes.create({
+        data: { feedId, userId },
+      }),
+    ]);
+
+    return result[0];
   }
 
   async unlikeFeed(feedId: number, userId: string): Promise<void> {
