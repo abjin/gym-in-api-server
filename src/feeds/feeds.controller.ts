@@ -34,6 +34,7 @@ import {
   PostFeedsRequestBodyDto,
   PostFeedsResponseDto,
   PostFeedLikesResponseDto,
+  GetFeedsCountsResponseDto,
 } from './dtos';
 
 @UseGuards(JwtGuard)
@@ -81,6 +82,16 @@ export class FeedsController {
     @RequestUser() { id: owner }: Users,
   ): Promise<GetFeedsResponseDto> {
     return this.feedsService.getMyFeeds(owner, dto);
+  }
+
+  @Get('my/counts')
+  @Get(':feedId')
+  @ApiOperation({ summary: 'get my feed' })
+  @ApiResponse({ type: GetFeedsCountsResponseDto })
+  getMyFeedsCounts(
+    @RequestUser() { id: owner }: Users,
+  ): Promise<GetFeedsCountsResponseDto> {
+    return this.feedsService.getMyFeedsCounts(owner);
   }
 
   @Get(':feedId')

@@ -8,6 +8,7 @@ import {
 import {
   GetCommentsRequestQueryDto,
   GetFeedResponseDto,
+  GetFeedsCountsResponseDto,
   GetFeedsRequestQueryDto,
   GetFeedsResponseDto,
   PostCommentsResponseDto,
@@ -144,7 +145,10 @@ export class FeedsService {
     });
   }
 
-  async getMyFeeds(userId: string, dto: GetFeedsRequestQueryDto) {
+  async getMyFeeds(
+    userId: string,
+    dto: GetFeedsRequestQueryDto,
+  ): Promise<GetFeedsResponseDto> {
     return this.prisma.feeds.findMany({
       where: { owner: userId },
       select: this.prisma.feedSelect,
@@ -153,5 +157,12 @@ export class FeedsService {
       orderBy: { id: 'desc' },
       ...(dto.lastId && { cursor: { id: dto.lastId } }),
     });
+  }
+
+  async getMyFeedsCounts(userId: string): Promise<GetFeedsCountsResponseDto> {
+    const count = await this.prisma.feeds.count({
+      where: { owner: userId },
+    });
+    return { count };
   }
 }
