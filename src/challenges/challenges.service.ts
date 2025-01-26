@@ -104,7 +104,7 @@ export class ChallengesService {
 
       const result = await this.prisma.challengeParticipants.update(query);
       participant = Object.assign(participant, result);
-      if (participant.rewardedAt) return participant;
+      if (participant.rewardedAt || !participant.status) return participant;
 
       const rewards = participant.challenge.rewards;
       const goalDays = participant.goalDays;
