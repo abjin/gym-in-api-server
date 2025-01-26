@@ -6,18 +6,20 @@ import * as timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const defaultTimeZone = 'Asia/Seoul';
+
 @Injectable()
 export class DateService {
   constructor() {}
 
   static getDateString({
-    timeZone = 'Asia/Seoul',
+    timeZone = defaultTimeZone,
     format = 'YYYY-MM-DD',
   } = {}): string {
     return dayjs().tz(timeZone).format(format);
   }
 
-  static getStartOfDayUTC(timeZone: string = 'Asia/Seoul'): Date {
+  static getStartOfDayUTC(timeZone: string = defaultTimeZone): Date {
     return dayjs().tz(timeZone).startOf('day').utc().toDate();
   }
 }

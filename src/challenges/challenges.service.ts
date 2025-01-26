@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'db/prisma.service';
 import { AvailableChallenge, ChallengeReward } from './dtos/get-challenges.dto';
-import { ChallengeParticipants } from '@prisma/client';
+import {
+  ChallengeCertificationLogs,
+  ChallengeParticipants,
+} from '@prisma/client';
 import { DateService } from '@libs/date';
 
 @Injectable()
@@ -73,6 +76,20 @@ export class ChallengesService {
         challenge: this.prisma.currentChallengeCondition,
       },
       include: { challenge: { include: { rewards: true } } },
+    });
+  }
+
+  async getMyCertifications(
+    userId: string,
+    challengeId: number,
+  ): Promise<ChallengeCertificationLogs[]> {
+    const participant =
+      await this.prisma.challengeParticipants.findFirstOrThrow({
+        where: { userId, challengeId },
+      });
+
+    return this.prisma.challengeCertificationLogs.findMany({
+      where: { participantId: participant.participantId },
     });
   }
 

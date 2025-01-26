@@ -43,12 +43,20 @@ export class AvailableChallenge {
 
   @Expose()
   @Transform(({ value }) => value.toISOString().split('T')[0])
-  @ApiProperty({ description: '챌린지 시작일', type: String })
+  @ApiProperty({
+    description: '챌린지 시작일',
+    format: 'YYYY-MM-DD',
+    type: String,
+  })
   startDate: Date;
 
   @Expose()
   @Transform(({ value }) => value.toISOString().split('T')[0])
-  @ApiProperty({ description: '챌린지 종료일', type: String })
+  @ApiProperty({
+    description: '챌린지 종료일',
+    format: 'YYYY-MM-DD',
+    type: String,
+  })
   endDate: Date;
 
   @Expose()

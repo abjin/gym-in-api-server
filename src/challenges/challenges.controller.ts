@@ -17,6 +17,7 @@ import {
   ChallengeReward,
   OngoingChallenge,
   PostParticipantsRequestBodyDto,
+  ChallengeCertifications,
 } from './dtos';
 
 @UseGuards(JwtGuard)
@@ -91,6 +92,23 @@ export class ChallengesController {
       challengeId,
     );
     return new OngoingChallenge(participant.challenge, participant);
+  }
+
+  @Get(':challengeId/participants/my/certifications')
+  @ApiOperation({ summary: 'get my certifications' })
+  @ApiResponse({ type: ChallengeCertifications, isArray: true })
+  async getMyCertifications(
+    @Param('challengeId', ParseIntPipe) challengeId: number,
+    @RequestUser() user: Users,
+  ): Promise<ChallengeCertifications[]> {
+    const certifications = await this.challengesService.getMyCertifications(
+      user.id,
+      challengeId,
+    );
+
+    return certifications.map(
+      (certification) => new ChallengeCertifications(certification),
+    );
   }
 
   @Post('attendances/certifications')
