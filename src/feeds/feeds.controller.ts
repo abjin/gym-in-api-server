@@ -40,7 +40,7 @@ export class FeedsController {
   @Get('presigned-urls')
   @ApiOperation({ summary: 'get presigned url' })
   @ApiResponse({ type: GetPresignedUrlResponseDto })
-  getChallengePreSignedUrls(
+  getFeedsPreSignedUrls(
     @Query() { count }: GetPresignedUrlRequestDto,
     @RequestUser() { id }: Users,
   ) {
