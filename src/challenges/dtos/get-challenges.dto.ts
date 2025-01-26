@@ -1,6 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { $Enums } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+
+export class ChallengeReward {
+  @ApiProperty({ description: '챌린지 ID', type: Number })
+  challengeId: number;
+
+  @ApiProperty({ description: '챌린지 보상 일수', type: Number })
+  days: number;
+
+  @ApiProperty({
+    description: '챌린지 보상 타입',
+    enum: $Enums.ChallengeRewardType,
+  })
+  type: $Enums.ChallengeRewardType;
+
+  @ApiProperty({ description: '챌린지 보상 금액', type: Number })
+  amount: number;
+
+  constructor(partial: Partial<ChallengeReward>) {
+    Object.assign(this, partial);
+  }
+}
 
 export class AvailableChallenge {
   @ApiProperty({ description: '챌린지 ID', type: Number })
@@ -22,6 +43,10 @@ export class AvailableChallenge {
   @Transform(({ value }) => value.toISOString().split('T')[0])
   @ApiProperty({ description: '챌린지 종료일', type: String })
   endDate: Date;
+
+  @Type(() => ChallengeReward)
+  @ApiProperty({ description: '챌린지 보상 목록', type: [ChallengeReward] })
+  rewards: ChallengeReward[];
 
   constructor(partial: Partial<AvailableChallenge>) {
     Object.assign(this, partial);

@@ -72,6 +72,15 @@ model Challenges {
   type        ChallengeType
   startDate   DateTime      @db.Date
   endDate     DateTime      @db.Date
+  rewards     ChallengeRewards[] @relation("challengeToReward")
+}
+
+model ChallengeRewards {
+  challengeId Int @id()
+  days        Int
+  type        ChallengeRewardType
+  amount      Int
+  challenge   Challenges @relation("challengeToReward",fields: [challengeId], references: [id])
 }
 
 enum AccountType {
@@ -81,4 +90,8 @@ enum AccountType {
 
 enum ChallengeType {
   attendanceTime
+}
+
+enum ChallengeRewardType {
+  experiencePoint
 }
