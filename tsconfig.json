@@ -30,6 +30,12 @@
       ],
       "@libs/s3/*": [
         "libs/s3/src/*"
+      ],
+      "@libs/date": [
+        "libs/date/src"
+      ],
+      "@libs/date/*": [
+        "libs/date/src/*"
       ]
     }
   }
