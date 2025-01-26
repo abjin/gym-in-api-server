@@ -63,4 +63,15 @@ export class ChallengesService {
 
     return { challenge, participant };
   }
+
+  getMyChallenge(userId: string, challengeId: number) {
+    return this.prisma.challengeParticipants.findFirstOrThrow({
+      where: {
+        userId,
+        challengeId,
+        challenge: this.prisma.currentChallengeCondition,
+      },
+      include: { challenge: { include: { rewards: true } } },
+    });
+  }
 }

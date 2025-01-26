@@ -78,4 +78,18 @@ export class ChallengesController {
 
     return new OngoingChallenge(challenge, participant);
   }
+
+  @Get(':challengeId/participants/my')
+  @ApiOperation({ summary: 'get my challenge' })
+  @ApiResponse({ type: OngoingChallenge })
+  async getMyChallenge(
+    @Param('challengeId', ParseIntPipe) challengeId: number,
+    @RequestUser() user: Users,
+  ): Promise<OngoingChallenge> {
+    const participant = await this.challengesService.getMyChallenge(
+      user.id,
+      challengeId,
+    );
+    return new OngoingChallenge(participant.challenge, participant);
+  }
 }
