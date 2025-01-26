@@ -28,9 +28,26 @@ export class ChallengesController {
   @Get('available')
   @ApiOperation({ summary: 'get available challenges' })
   @ApiResponse({ type: AvailableChallenge, isArray: true })
-  async getAvailableChallenges(): Promise<AvailableChallenge[]> {
-    const challenges = await this.challengesService.getAvailableChallenges();
+  async getAvailableChallenges(
+    @RequestUser() user: Users,
+  ): Promise<AvailableChallenge[]> {
+    const challenges = await this.challengesService.getAvailableChallenges(
+      user.id,
+    );
     return challenges.map((challenge) => new AvailableChallenge(challenge));
+  }
+
+  @Get('ongoing')
+  @ApiOperation({ summary: 'get ongoing challenges' })
+  @ApiResponse({ type: OngoingChallenge, isArray: true })
+  async getOngoingChallenges(
+    @RequestUser() user: Users,
+  ): Promise<OngoingChallenge[]> {
+    const participants =
+      await this.challengesService.getOngoingChallengesParticipants(user.id);
+    return participants.map(
+      (participant) => new OngoingChallenge(participant.challenge, participant),
+    );
   }
 
   @Get(':challengeId/rewards')

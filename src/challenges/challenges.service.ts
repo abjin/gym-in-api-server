@@ -7,10 +7,27 @@ import { ChallengeParticipants } from '@prisma/client';
 export class ChallengesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getAvailableChallenges(): Promise<AvailableChallenge[]> {
-    return this.prisma.challenges.findMany({
+  async getAvailableChallenges(userId: string): Promise<AvailableChallenge[]> {
+    const challenges = await this.prisma.challenges.findMany({
       where: this.prisma.currentChallengeCondition,
       select: this.prisma.challengeSelect,
+    });
+
+    const participants = await this.prisma.challengeParticipants.findMany({
+      where: { userId },
+    });
+
+    return challenges.filter((challenge) => {
+      return !participants.find(
+        (participant) => participant.challengeId === challenge.id,
+      );
+    });
+  }
+
+  getOngoingChallengesParticipants(userId: string) {
+    return this.prisma.challengeParticipants.findMany({
+      where: { userId, challenge: this.prisma.currentChallengeCondition },
+      include: { challenge: { include: { rewards: true } } },
     });
   }
 

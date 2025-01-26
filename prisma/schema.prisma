@@ -66,33 +66,35 @@ model Comments {
 }
 
 model Challenges {
-  id          Int           @id @default(autoincrement())
-  name        String
-  description String
-  type        ChallengeType
-  startDate   DateTime      @db.Date
-  endDate     DateTime      @db.Date
-  rewards     ChallengeRewards[] @relation("challengeToReward")
+  id           Int                     @id @default(autoincrement())
+  name         String
+  description  String
+  type         ChallengeType
+  startDate    DateTime                @db.Date
+  endDate      DateTime                @db.Date
+  rewards      ChallengeRewards[]      @relation("challengeToReward")
+  participants ChallengeParticipants[] @relation("challengeToParticipant")
 }
 
 model ChallengeRewards {
-  challengeId Int @id()
+  challengeId Int                 @id()
   days        Int
   type        ChallengeRewardType
   amount      Int
-  challenge   Challenges @relation("challengeToReward",fields: [challengeId], references: [id])
+  challenge   Challenges          @relation("challengeToReward", fields: [challengeId], references: [id])
 }
 
 model ChallengeParticipants {
-  id             Int      @id @default(autoincrement())
+  participantId  Int           @id @default(autoincrement())
   userId         String
   challengeId    Int
   challengeType  ChallengeType
   goalDays       Int
-  successDays    Int      @default(0)
-  status         Boolean  @default(false)
-  participatedAt DateTime @default(now())
+  successDays    Int           @default(0)
+  status         Boolean       @default(false)
+  participatedAt DateTime      @default(now())
   updatedAt      DateTime?
+  challenge      Challenges    @relation("challengeToParticipant", fields: [challengeId], references: [id])
 }
 
 enum AccountType {
