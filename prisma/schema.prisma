@@ -46,11 +46,11 @@ model Feeds {
 }
 
 model FeedLikes {
-  feedId Int
-  userId String
-  createdAt     DateTime    @default(now())
-  feed   Feeds  @relation("feedToLike", fields: [feedId], references: [id])
-  user   Users  @relation("userToFeedLike", fields: [userId], references: [id])
+  feedId    Int
+  userId    String
+  createdAt DateTime @default(now())
+  feed      Feeds    @relation("feedToLike", fields: [feedId], references: [id])
+  user      Users    @relation("userToFeedLike", fields: [userId], references: [id])
 
   @@unique([feedId, userId])
 }
@@ -65,7 +65,20 @@ model Comments {
   feed       Feeds  @relation("feedToComment", fields: [feedId], references: [id])
 }
 
+model Challenges {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String
+  type        ChallengeType
+  startDate   DateTime      @db.Date
+  endDate     DateTime      @db.Date
+}
+
 enum AccountType {
   kakao
   naver
+}
+
+enum ChallengeType {
+  attendanceTime
 }
