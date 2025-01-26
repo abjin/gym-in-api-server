@@ -4,6 +4,7 @@ import { AvailableChallenge, ChallengeReward } from './dtos/get-challenges.dto';
 import {
   ChallengeCertificationLogs,
   ChallengeParticipants,
+  ChallengeRewards,
 } from '@prisma/client';
 import { DateService } from '@libs/date';
 
@@ -100,7 +101,11 @@ export class ChallengesService {
     const promises = participants.map(async (participant) => {
       const query = this.updateChallengeCertificationQueryBuilder(participant);
       if (!query) return null;
+
       const current = await this.prisma.challengeParticipants.update(query);
+      const rewards = participant.challenge.rewards;
+      const goalDays = participant.goalDays;
+      await this.giveChallegeRewards({ userId, rewards, goalDays });
       return Object.assign(participant, current);
     });
 
@@ -143,5 +148,30 @@ export class ChallengesService {
     };
 
     return { where, data };
+  }
+
+  giveChallegeRewards({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    userId,
+    rewards,
+    goalDays,
+  }: {
+    userId: string;
+    rewards: ChallengeRewards[];
+    goalDays: number;
+  }) {
+    let maxReward = null;
+
+    rewards.forEach((r) => {
+      const canReceiveReward = r.days <= goalDays;
+      const isMaxReward = !maxReward || maxReward.days < r.days;
+      if (canReceiveReward && isMaxReward) maxReward = r;
+    });
+
+    if (!maxReward) return maxReward;
+
+    // TODO: Implement reward giving logic
+
+    return rewards;
   }
 }
