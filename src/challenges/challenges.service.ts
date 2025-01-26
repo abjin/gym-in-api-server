@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'db/prisma.service';
 import { AvailableChallenge, ChallengeReward } from './dtos/get-challenges.dto';
 import { ChallengeParticipants } from '@prisma/client';
+import { DateService } from '@libs/date';
 
 @Injectable()
 export class ChallengesService {
@@ -73,5 +74,57 @@ export class ChallengesService {
       },
       include: { challenge: { include: { rewards: true } } },
     });
+  }
+
+  async certifyAttendanceChallenges(userId: string) {
+    const participants =
+      await this.getParticipantsForUpdateByCheckInTime(userId);
+
+    const promises = participants.map(async (participant) => {
+      const query = this.updateChallengeCertificationQueryBuilder(participant);
+      if (!query) return null;
+      const current = await this.prisma.challengeParticipants.update(query);
+      return Object.assign(participant, current);
+    });
+
+    return Promise.all(promises).then((results) => results.filter((r) => !!r));
+  }
+
+  private async getParticipantsForUpdateByCheckInTime(userId: string) {
+    const checkInTime = DateService.getDateString({ format: 'HH-mm' });
+    const participants = await this.getOngoingChallengesParticipants(userId);
+    const conditions = await this.prisma.attendanceChallengeConditions.findMany(
+      {
+        where: {
+          challengeId: { in: participants.map((p) => p.challengeId) },
+          startTime: { lte: checkInTime },
+          endTime: { gte: checkInTime },
+        },
+      },
+    );
+
+    return conditions.map((condition) =>
+      participants.find((p) => p.challengeId === condition.challengeId),
+    );
+  }
+
+  private updateChallengeCertificationQueryBuilder(
+    participant: ChallengeParticipants,
+  ) {
+    if (participant.updatedAt > DateService.getStartOfDayUTC()) return null;
+
+    const successDays = participant.successDays + 1;
+    const updatedAt = new Date();
+    const date = new Date(DateService.getDateString());
+
+    const where = { participantId: participant.participantId };
+    const data = {
+      status: participant.goalDays <= successDays,
+      successDays,
+      updatedAt,
+      certificationLogs: { create: { userId: participant.userId, date } },
+    };
+
+    return { where, data };
   }
 }

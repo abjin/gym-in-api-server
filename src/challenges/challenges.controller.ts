@@ -92,4 +92,15 @@ export class ChallengesController {
     );
     return new OngoingChallenge(participant.challenge, participant);
   }
+
+  @Post('attendances/certifications')
+  @ApiOperation({ summary: 'certify attendance challenges' })
+  @ApiResponse({ type: OngoingChallenge, isArray: true })
+  async certifyAttendanceChallenges(@RequestUser() user: Users) {
+    const participants =
+      await this.challengesService.certifyAttendanceChallenges(user.id);
+    return participants.map(
+      (participant) => new OngoingChallenge(participant.challenge, participant),
+    );
+  }
 }

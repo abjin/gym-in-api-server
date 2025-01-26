@@ -66,14 +66,15 @@ model Comments {
 }
 
 model Challenges {
-  id           Int                     @id @default(autoincrement())
+  id           Int                             @id @default(autoincrement())
   name         String
   description  String
   type         ChallengeType
-  startDate    DateTime                @db.Date
-  endDate      DateTime                @db.Date
-  rewards      ChallengeRewards[]      @relation("challengeToReward")
-  participants ChallengeParticipants[] @relation("challengeToParticipant")
+  startDate    DateTime                        @db.Date
+  endDate      DateTime                        @db.Date
+  rewards      ChallengeRewards[]              @relation("challengeToReward")
+  participants ChallengeParticipants[]         @relation("challengeToParticipant")
+  conditions   AttendanceChallengeConditions[] @relation("challengeToCondition")
 }
 
 model ChallengeRewards {
@@ -85,16 +86,33 @@ model ChallengeRewards {
 }
 
 model ChallengeParticipants {
-  participantId  Int           @id @default(autoincrement())
-  userId         String
-  challengeId    Int
-  challengeType  ChallengeType
-  goalDays       Int
-  successDays    Int           @default(0)
-  status         Boolean       @default(false)
-  participatedAt DateTime      @default(now())
-  updatedAt      DateTime?
-  challenge      Challenges    @relation("challengeToParticipant", fields: [challengeId], references: [id])
+  participantId     Int                          @id @default(autoincrement())
+  userId            String
+  challengeId       Int
+  challengeType     ChallengeType
+  goalDays          Int
+  successDays       Int                          @default(0)
+  status            Boolean                      @default(false)
+  participatedAt    DateTime                     @default(now())
+  updatedAt         DateTime?
+  challenge         Challenges                   @relation("challengeToParticipant", fields: [challengeId], references: [id])
+  certificationLogs ChallengeCertificationLogs[] @relation("participantToCertificationLog")
+}
+
+model AttendanceChallengeConditions {
+  challengeId Int        @id
+  startTime   String // format: HH-mm
+  endTime     String // fromat: HH-mm
+  challenge   Challenges @relation("challengeToCondition", fields: [challengeId], references: [id])
+}
+
+model ChallengeCertificationLogs {
+  participantId Int
+  userId        String
+  date          DateTime              @db.Date
+  participant   ChallengeParticipants @relation("participantToCertificationLog", fields: [participantId], references: [participantId])
+
+  @@unique([participantId, date])
 }
 
 enum AccountType {

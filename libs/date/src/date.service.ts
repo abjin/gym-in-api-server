@@ -10,7 +10,14 @@ dayjs.extend(timezone);
 export class DateService {
   constructor() {}
 
-  static getDateString(timeZone = 'Asia/Seoul', format = 'YYYY-MM-DD'): string {
+  static getDateString({
+    timeZone = 'Asia/Seoul',
+    format = 'YYYY-MM-DD',
+  } = {}): string {
     return dayjs().tz(timeZone).format(format);
+  }
+
+  static getStartOfDayUTC(timeZone: string = 'Asia/Seoul'): Date {
+    return dayjs().tz(timeZone).startOf('day').utc().toDate();
   }
 }
