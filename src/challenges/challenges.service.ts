@@ -102,11 +102,14 @@ export class ChallengesService {
       const query = this.updateChallengeCertificationQueryBuilder(participant);
       if (!query) return null;
 
-      const current = await this.prisma.challengeParticipants.update(query);
+      const result = await this.prisma.challengeParticipants.update(query);
+      participant = Object.assign(participant, result);
+      if (participant.rewardedAt) return participant;
+
       const rewards = participant.challenge.rewards;
       const goalDays = participant.goalDays;
       await this.giveChallegeRewards({ userId, rewards, goalDays });
-      return Object.assign(participant, current);
+      return participant;
     });
 
     return Promise.all(promises).then((results) => results.filter((r) => !!r));
@@ -150,7 +153,7 @@ export class ChallengesService {
     return { where, data };
   }
 
-  giveChallegeRewards({
+  async giveChallegeRewards({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId,
     rewards,
@@ -172,6 +175,13 @@ export class ChallengesService {
 
     // TODO: Implement reward giving logic
 
-    return rewards;
+    await this.prisma.challengeParticipants.update({
+      where: {
+        userId_challengeId: { userId, challengeId: maxReward.challengeId },
+      },
+      data: { rewardedAt: new Date() },
+    });
+
+    return maxReward;
   }
 }

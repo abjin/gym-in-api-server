@@ -97,6 +97,7 @@ model ChallengeParticipants {
   updatedAt         DateTime?
   challenge         Challenges                   @relation("challengeToParticipant", fields: [challengeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   certificationLogs ChallengeCertificationLogs[] @relation("participantToCertificationLog")
+  rewardedAt        DateTime?
 
   @@unique([userId, challengeId])
 }
