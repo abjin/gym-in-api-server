@@ -83,6 +83,18 @@ model ChallengeRewards {
   challenge   Challenges @relation("challengeToReward",fields: [challengeId], references: [id])
 }
 
+model ChallengeParticipants {
+  id             Int      @id @default(autoincrement())
+  userId         String
+  challengeId    Int
+  challengeType  ChallengeType
+  goalDays       Int
+  successDays    Int      @default(0)
+  status         Boolean  @default(false)
+  participatedAt DateTime @default(now())
+  updatedAt      DateTime?
+}
+
 enum AccountType {
   kakao
   naver

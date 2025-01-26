@@ -1,14 +1,23 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
   ParseIntPipe,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { AvailableChallenge, ChallengeReward } from './dtos/get-challenges.dto';
+import { RequestUser } from 'src/user.decorator';
+import { Users } from '@prisma/client';
+import {
+  AvailableChallenge,
+  ChallengeReward,
+  OngoingChallenge,
+  PostParticipantsRequestBodyDto,
+} from './dtos';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -24,14 +33,32 @@ export class ChallengesController {
     return challenges.map((challenge) => new AvailableChallenge(challenge));
   }
 
-  @Get(':chellengeId/rewards')
+  @Get(':challengeId/rewards')
   @ApiOperation({ summary: 'get rewards for a challenge' })
   @ApiResponse({ type: ChallengeReward, isArray: true })
   async getRewards(
-    @Param('chellengeId', ParseIntPipe) chellengeId: number,
+    @Param('challengeId', ParseIntPipe) challengeId: number,
   ): Promise<ChallengeReward[]> {
     const rewards =
-      await this.challengesService.getChallengeRewards(chellengeId);
+      await this.challengesService.getChallengeRewards(challengeId);
     return rewards.map((reward) => new ChallengeReward(reward));
+  }
+
+  @Post(':challengeId/participants')
+  @ApiOperation({ summary: 'join a challenge' })
+  @ApiResponse({ type: OngoingChallenge })
+  async joinChallenge(
+    @Param('challengeId', ParseIntPipe) challengeId: number,
+    @Body() { goalDays }: PostParticipantsRequestBodyDto,
+    @RequestUser() user: Users,
+  ): Promise<OngoingChallenge> {
+    const { challenge, participant } =
+      await this.challengesService.joinChallenge({
+        challengeId,
+        userId: user.id,
+        goalDays,
+      });
+
+    return new OngoingChallenge(challenge, participant);
   }
 }
