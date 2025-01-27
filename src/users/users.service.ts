@@ -7,6 +7,7 @@ import { $Enums } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from 'src/auth/auth.service';
 import { PutUserResponseDto } from './dtos/put-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -14,9 +15,14 @@ export class UsersService {
     private readonly httpService: HttpService,
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
+    private readonly config: ConfigService,
   ) {}
 
+  private readonly isLocal = this.config.get('NODE_ENV') === 'development';
+
   public async getKakaoUser(snsToken: string) {
+    if (this.isLocal) return { id: `${Date.now()}`, type: 'kakao' };
+
     const response =
       await this.httpService.axiosRef.get<KakaoGetUserProfileApiResponse>(
         'https://kapi.kakao.com/v2/user/me',

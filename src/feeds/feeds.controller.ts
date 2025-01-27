@@ -33,6 +33,8 @@ import {
   PostCommentsResponseDto,
   PostFeedsRequestBodyDto,
   PostFeedsResponseDto,
+  PostFeedLikesResponseDto,
+  GetCountsResponseDto,
 } from './dtos';
 
 @UseGuards(JwtGuard)
@@ -69,6 +71,44 @@ export class FeedsController {
     @Query() dto: GetFeedsRequestQueryDto,
   ): Promise<GetFeedsResponseDto> {
     return this.feedsService.getFeeds(dto);
+  }
+
+  @Get('my')
+  @ApiOperation({ summary: 'get my feeds' })
+  @ApiResponse({ type: GetFeedsResponseDto })
+  getMyFeeds(
+    @Query() dto: GetFeedsRequestQueryDto,
+    @RequestUser() { id: owner }: Users,
+  ): Promise<GetFeedsResponseDto> {
+    return this.feedsService.getMyFeeds(owner, dto);
+  }
+
+  @Get('my/counts')
+  @ApiOperation({ summary: 'get my feeds counts' })
+  @ApiResponse({ type: GetCountsResponseDto })
+  getMyFeedsCounts(
+    @RequestUser() { id: owner }: Users,
+  ): Promise<GetCountsResponseDto> {
+    return this.feedsService.getMyFeedsCounts(owner);
+  }
+
+  @Get('my/comments')
+  @ApiOperation({ summary: 'get my comments' })
+  @ApiResponse({ type: GetCommentsResponseDto })
+  getMyComments(
+    @RequestUser() { id: owner }: Users,
+    @Query() dto: GetCommentsRequestQueryDto,
+  ): Promise<GetCommentsResponseDto> {
+    return this.feedsService.getMyComments(dto, owner);
+  }
+
+  @Get('my/comments/counts')
+  @ApiOperation({ summary: 'get my comments count' })
+  @ApiResponse({ type: GetCountsResponseDto })
+  getMyCommentsCounts(
+    @RequestUser() { id: owner }: Users,
+  ): Promise<GetCountsResponseDto> {
+    return this.feedsService.getMyCommentsCounts(owner);
   }
 
   @Get(':feedId')
@@ -120,5 +160,25 @@ export class FeedsController {
     @RequestUser() { id: owner }: Users,
   ): Promise<void> {
     return this.feedsService.deleteComment({ commentId, feedId, owner });
+  }
+
+  @Post(':feedId/likes')
+  @ApiOperation({ summary: 'like feed' })
+  @ApiResponse({ type: PostFeedLikesResponseDto })
+  likeFeed(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @RequestUser() { id: userId }: Users,
+  ): Promise<PostFeedLikesResponseDto> {
+    return this.feedsService.likeFeed(feedId, userId);
+  }
+
+  @Delete(':feedId/likes')
+  @ApiOperation({ summary: 'unlike feed' })
+  @ApiResponse({ type: undefined })
+  unlikeFeed(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @RequestUser() { id: userId }: Users,
+  ): Promise<void> {
+    return this.feedsService.unlikeFeed(feedId, userId);
   }
 }

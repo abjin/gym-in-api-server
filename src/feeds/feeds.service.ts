@@ -1,5 +1,5 @@
 import { S3Service } from '@libs/s3';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'db/prisma.service';
 import {
   PostFeedsRequestBodyDto,
@@ -7,11 +7,14 @@ import {
 } from './dtos/post-feeds.dto';
 import {
   GetCommentsRequestQueryDto,
+  GetCommentsResponseDto,
   GetFeedResponseDto,
+  GetCountsResponseDto,
   GetFeedsRequestQueryDto,
   GetFeedsResponseDto,
   PostCommentsResponseDto,
 } from './dtos';
+import { PostFeedLikesResponseDto } from './dtos/post-feed-likes.dto';
 
 @Injectable()
 export class FeedsService {
@@ -37,9 +40,9 @@ export class FeedsService {
     id: string,
     dto: PostFeedsRequestBodyDto,
   ): Promise<PostFeedsResponseDto> {
-    return this.prisma.posts.create({
+    return this.prisma.feeds.create({
       data: { owner: id, content: dto.content, imageUrls: dto.imageUrls },
-      select: this.prisma.postSelect,
+      select: this.prisma.feedSelect,
     });
   }
 
@@ -47,8 +50,8 @@ export class FeedsService {
     lastId,
     limit,
   }: GetFeedsRequestQueryDto): Promise<GetFeedsResponseDto> {
-    return this.prisma.posts.findMany({
-      select: this.prisma.postSelect,
+    return this.prisma.feeds.findMany({
+      select: this.prisma.feedSelect,
       take: limit,
       skip: lastId ? 1 : 0,
       orderBy: { id: 'desc' },
@@ -57,14 +60,14 @@ export class FeedsService {
   }
 
   async getFeed(id: number): Promise<GetFeedResponseDto> {
-    return this.prisma.posts.findFirst({
+    return this.prisma.feeds.findFirst({
       where: { id },
-      select: this.prisma.postSelect,
+      select: this.prisma.feedSelect,
     });
   }
 
   async deleteFeed(id: number, owner: string): Promise<void> {
-    await this.prisma.posts.delete({ where: { id, owner } });
+    await this.prisma.feeds.delete({ where: { id, owner } });
   }
 
   async createComments({
@@ -82,7 +85,10 @@ export class FeedsService {
     });
   }
 
-  async getComments(dto: GetCommentsRequestQueryDto, feedId: number) {
+  async getComments(
+    dto: GetCommentsRequestQueryDto,
+    feedId: number,
+  ): Promise<GetCommentsResponseDto> {
     return this.prisma.comments.findMany({
       where: { feedId },
       select: this.prisma.commentSelect,
@@ -105,5 +111,81 @@ export class FeedsService {
     await this.prisma.comments.delete({
       where: { id: commentId, feedId, owner },
     });
+  }
+
+  async likeFeed(
+    feedId: number,
+    userId: string,
+  ): Promise<PostFeedLikesResponseDto> {
+    const likes = await this.prisma.feedLikes.findUnique({
+      where: { feedId_userId: { feedId, userId } },
+    });
+
+    if (likes) throw new ConflictException('Already liked');
+
+    const result = await Promise.all([
+      this.prisma.feeds.update({
+        where: { id: feedId },
+        select: { likeCounts: true },
+        data: { likeCounts: { increment: 1 } },
+      }),
+      this.prisma.feedLikes.create({
+        data: { feedId, userId },
+      }),
+    ]);
+
+    return result[0];
+  }
+
+  async unlikeFeed(feedId: number, userId: string): Promise<void> {
+    await this.prisma.feedLikes.delete({
+      where: { feedId_userId: { feedId, userId } },
+    });
+
+    await this.prisma.feeds.update({
+      where: { id: feedId },
+      select: { likeCounts: true },
+      data: { likeCounts: { decrement: 1 } },
+    });
+  }
+
+  async getMyFeeds(
+    userId: string,
+    dto: GetFeedsRequestQueryDto,
+  ): Promise<GetFeedsResponseDto> {
+    return this.prisma.feeds.findMany({
+      where: { owner: userId },
+      select: this.prisma.feedSelect,
+      take: dto.limit,
+      skip: dto.lastId ? 1 : 0,
+      orderBy: { id: 'desc' },
+      ...(dto.lastId && { cursor: { id: dto.lastId } }),
+    });
+  }
+
+  async getMyFeedsCounts(userId: string): Promise<GetCountsResponseDto> {
+    const count = await this.prisma.feeds.count({
+      where: { owner: userId },
+    });
+    return { count };
+  }
+
+  async getMyComments(
+    dto: GetCommentsRequestQueryDto,
+    owner: string,
+  ): Promise<GetCommentsResponseDto> {
+    return this.prisma.comments.findMany({
+      where: { owner },
+      select: this.prisma.commentSelect,
+      take: dto.limit,
+      skip: dto.lastId ? 1 : 0,
+      orderBy: { id: 'desc' },
+      ...(dto.lastId && { cursor: { id: dto.lastId } }),
+    });
+  }
+
+  async getMyCommentsCounts(owner: string): Promise<GetCountsResponseDto> {
+    const count = await this.prisma.comments.count({ where: { owner } });
+    return { count };
   }
 }
