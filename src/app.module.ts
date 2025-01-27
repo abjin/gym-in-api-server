@@ -5,6 +5,7 @@ import { HttpModule } from '@nestjs/axios';
 import { DbModule } from 'db/db.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { FeedsModule } from './feeds/feeds.module';
 import { S3Module } from '@libs/s3';
 
 @Module({
@@ -15,6 +16,7 @@ import { S3Module } from '@libs/s3';
     S3Module,
     AuthModule,
     UsersModule,
+    FeedsModule,
   ],
   controllers: [AppController],
 })
