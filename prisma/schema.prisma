@@ -14,10 +14,12 @@ datasource db {
 }
 
 model Users {
-  id       String     @id
-  nickname String
-  accounts Accounts[] @relation("userToAccount")
-  posts    Posts[]    @relation("userToPost")
+  id        String      @id
+  nickname  String
+  accounts  Accounts[]  @relation("userToAccount")
+  feeds     Feeds[]     @relation("userToFeed")
+  comments  Comments[]  @relation("userToComment")
+  feedLikes FeedLikes[] @relation("userToFeedLike")
 }
 
 model Accounts {
@@ -30,15 +32,37 @@ model Accounts {
   @@id([id, type])
 }
 
-model Posts {
-  id            Int      @id @default(autoincrement())
+model Feeds {
+  id            Int         @id @default(autoincrement())
   owner         String
   content       String
   imageUrls     Json
-  createdAt     DateTime @default(now())
-  commentCounts Int      @default(0)
-  likesCounts   Int      @default(0)
-  author        Users    @relation("userToPost", fields: [owner], references: [id])
+  createdAt     DateTime    @default(now())
+  commentCounts Int         @default(0)
+  likeCounts    Int         @default(0)
+  comments      Comments[]  @relation("feedToComment")
+  likes         FeedLikes[] @relation("feedToLike")
+  author        Users       @relation("userToFeed", fields: [owner], references: [id])
+}
+
+model FeedLikes {
+  feedId Int
+  userId String
+  createdAt     DateTime    @default(now())
+  feed   Feeds  @relation("feedToLike", fields: [feedId], references: [id])
+  user   Users  @relation("userToFeedLike", fields: [userId], references: [id])
+
+  @@unique([feedId, userId])
+}
+
+model Comments {
+  id         Int    @id @default(autoincrement())
+  feedId     Int
+  owner      String
+  content    String
+  likeCounts Int    @default(0)
+  author     Users  @relation("userToComment", fields: [owner], references: [id])
+  feed       Feeds  @relation("feedToComment", fields: [feedId], references: [id])
 }
 
 enum AccountType {

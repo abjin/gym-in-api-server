@@ -14,14 +14,23 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$connect();
   }
 
-  public readonly postSelect = {
+  public readonly feedSelect = {
     id: true,
     owner: true,
     content: true,
     imageUrls: true,
     createdAt: true,
     commentCounts: true,
-    likesCounts: true,
+    likeCounts: true,
+    author: true,
+  };
+
+  public readonly commentSelect = {
+    id: true,
+    feedId: true,
+    owner: true,
+    content: true,
+    likeCounts: true,
     author: true,
   };
 }
