@@ -42,15 +42,15 @@ model Feeds {
   likeCounts    Int         @default(0)
   comments      Comments[]  @relation("feedToComment")
   likes         FeedLikes[] @relation("feedToLike")
-  author        Users       @relation("userToFeed", fields: [owner], references: [id])
+  author        Users       @relation("userToFeed", fields: [owner], references: [id], onDelete: NoAction, onUpdate: Cascade)
 }
 
 model FeedLikes {
-  feedId Int
-  userId String
-  createdAt     DateTime    @default(now())
-  feed   Feeds  @relation("feedToLike", fields: [feedId], references: [id])
-  user   Users  @relation("userToFeedLike", fields: [userId], references: [id])
+  feedId    Int
+  userId    String
+  createdAt DateTime @default(now())
+  feed      Feeds    @relation("feedToLike", fields: [feedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user      Users    @relation("userToFeedLike", fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade)
 
   @@unique([feedId, userId])
 }
@@ -61,11 +61,72 @@ model Comments {
   owner      String
   content    String
   likeCounts Int    @default(0)
-  author     Users  @relation("userToComment", fields: [owner], references: [id])
-  feed       Feeds  @relation("feedToComment", fields: [feedId], references: [id])
+  author     Users  @relation("userToComment", fields: [owner], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  feed       Feeds  @relation("feedToComment", fields: [feedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Challenges {
+  id           Int                             @id @default(autoincrement())
+  name         String
+  description  String
+  type         ChallengeType
+  startDate    DateTime                        @db.Date
+  endDate      DateTime                        @db.Date
+  rewards      ChallengeRewards[]              @relation("challengeToReward")
+  participants ChallengeParticipants[]         @relation("challengeToParticipant")
+  conditions   AttendanceChallengeConditions[] @relation("challengeToCondition")
+}
+
+model ChallengeRewards {
+  challengeId Int                 @id()
+  days        Int
+  type        ChallengeRewardType
+  amount      Int
+  challenge   Challenges          @relation("challengeToReward", fields: [challengeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model ChallengeParticipants {
+  participantId     Int                          @id @default(autoincrement())
+  userId            String
+  challengeId       Int
+  challengeType     ChallengeType
+  goalDays          Int
+  successDays       Int                          @default(0)
+  status            Boolean                      @default(false)
+  participatedAt    DateTime                     @default(now())
+  updatedAt         DateTime?
+  challenge         Challenges                   @relation("challengeToParticipant", fields: [challengeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  certificationLogs ChallengeCertificationLogs[] @relation("participantToCertificationLog")
+  rewardedAt        DateTime?
+
+  @@unique([userId, challengeId])
+}
+
+model AttendanceChallengeConditions {
+  challengeId Int        @id
+  startTime   String // format: HH-mm
+  endTime     String // fromat: HH-mm
+  challenge   Challenges @relation("challengeToCondition", fields: [challengeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model ChallengeCertificationLogs {
+  participantId Int
+  userId        String
+  date          DateTime              @db.Date
+  participant   ChallengeParticipants @relation("participantToCertificationLog", fields: [participantId], references: [participantId], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([participantId, date])
 }
 
 enum AccountType {
   kakao
   naver
+}
+
+enum ChallengeType {
+  attendanceTime
+}
+
+enum ChallengeRewardType {
+  experiencePoint
 }

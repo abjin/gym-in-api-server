@@ -12,6 +12,8 @@
   },
   "moduleNameMapper": {
     "@libs/s3/(.*)": "<rootDir>/../libs/s3/src/$1",
-    "@libs/s3": "<rootDir>/../libs/s3/src"
+    "@libs/s3": "<rootDir>/../libs/s3/src",
+    "@libs/date/(.*)": "<rootDir>/../libs/date/src/$1",
+    "@libs/date": "<rootDir>/../libs/date/src"
   }
 }

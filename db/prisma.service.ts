@@ -1,3 +1,4 @@
+import { DateService } from '@libs/date';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
@@ -32,5 +33,20 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     content: true,
     likeCounts: true,
     author: true,
+  };
+
+  get currentChallengeCondition() {
+    const today = new Date(DateService.getDateString());
+    return { startDate: { lte: today }, endDate: { gte: today } };
+  }
+
+  public readonly challengeSelect = {
+    id: true,
+    name: true,
+    description: true,
+    type: true,
+    startDate: true,
+    endDate: true,
+    rewards: true,
   };
 }
