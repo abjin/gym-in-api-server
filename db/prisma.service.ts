@@ -32,6 +32,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     owner: true,
     content: true,
     likeCounts: true,
+    createdAt: true,
     author: true,
   };
 
