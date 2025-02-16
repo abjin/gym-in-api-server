@@ -12,7 +12,12 @@ export class GetFeedsRequestQueryDto {
   @IsOptional()
   lastId?: number;
 
-  @ApiProperty({ description: '개수', type: Number, required: false })
+  @ApiProperty({
+    description: '개수',
+    type: Number,
+    required: false,
+    default: 30,
+  })
   @IsNumber()
   @IsOptional()
   limit?: number = 30;
