@@ -56,14 +56,14 @@ model FeedLikes {
 }
 
 model Comments {
-  id         Int    @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   feedId     Int
   owner      String
   content    String
-  likeCounts Int    @default(0)
+  likeCounts Int      @default(0)
   createdAt  DateTime @default(now())
-  author     Users  @relation("userToComment", fields: [owner], references: [id], onDelete: NoAction, onUpdate: Cascade)
-  feed       Feeds  @relation("feedToComment", fields: [feedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author     Users    @relation("userToComment", fields: [owner], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  feed       Feeds    @relation("feedToComment", fields: [feedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Challenges {
