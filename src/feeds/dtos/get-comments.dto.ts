@@ -35,6 +35,9 @@ export class GetCommentResponseDto {
   @ApiProperty({ description: '좋아요 수', type: Number })
   likeCounts: number;
 
+  @ApiProperty({ description: '작성일', type: Date })
+  createdAt: Date;
+
   @ApiProperty({ description: '작성자 정보', type: UserDto })
   author: Users;
 }
