@@ -79,10 +79,18 @@ export class FeedsService {
     owner: string;
     content: string;
   }): Promise<PostCommentsResponseDto> {
-    return this.prisma.comments.create({
-      data: { feedId, owner, content },
-      select: this.prisma.commentSelect,
-    });
+    const result = await this.prisma.$transaction([
+      this.prisma.feeds.update({
+        where: { id: feedId },
+        data: { commentCounts: { increment: 1 } },
+      }),
+      this.prisma.comments.create({
+        data: { feedId, owner, content },
+        select: this.prisma.commentSelect,
+      }),
+    ]);
+
+    return result[1];
   }
 
   async getComments(
@@ -108,9 +116,15 @@ export class FeedsService {
     feedId: number;
     owner: string;
   }): Promise<void> {
-    await this.prisma.comments.delete({
-      where: { id: commentId, feedId, owner },
-    });
+    await this.prisma.$transaction([
+      this.prisma.comments.delete({
+        where: { id: commentId, feedId, owner },
+      }),
+      this.prisma.feeds.update({
+        where: { id: feedId },
+        data: { commentCounts: { decrement: 1 } },
+      }),
+    ]);
   }
 
   async likeFeed(
