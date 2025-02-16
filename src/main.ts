@@ -26,6 +26,8 @@ async function bootstrap() {
   if (configService.getOrThrow('NODE_ENV') !== 'production') useSwagger(app);
 
   const origins = [
+    'http://localhost:4173',
+    'https://localhost:4173',
     'http://localhost:5173',
     'https://localhost:5173',
     'https://gym-in-korea.web.app',
