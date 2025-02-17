@@ -79,11 +79,13 @@ model Challenges {
 }
 
 model ChallengeRewards {
-  challengeId Int                 @id()
+  challengeId Int
   days        Int
   type        ChallengeRewardType
   amount      Int
   challenge   Challenges          @relation("challengeToReward", fields: [challengeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([challengeId, days])
 }
 
 model ChallengeParticipants {
