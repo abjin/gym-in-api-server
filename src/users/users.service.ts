@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from 'src/auth/auth.service';
 import { PutUserDto } from './dtos/put-user.dto';
 import { ConfigService } from '@nestjs/config';
+import { S3Service } from '@libs/s3';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +17,7 @@ export class UsersService {
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
     private readonly config: ConfigService,
+    private readonly s3Service: S3Service,
   ) {}
 
   private readonly isLocal = this.config.get('NODE_ENV') === 'development';
@@ -85,5 +87,18 @@ export class UsersService {
 
   public deleteUser(userId: string) {
     return this.prismaService.users.delete({ where: { id: userId } });
+  }
+
+  public getPreSignedUrls(userId: string, count = 1) {
+    const ts = Date.now();
+
+    const result = [];
+    for (let i = 0; i < count; i += 1) {
+      const key = `users/${userId}/${ts}_${i}`;
+      const url = this.s3Service.makePutImagePreSignedUrl(key);
+      result.push({ url, key });
+    }
+
+    return result;
   }
 }

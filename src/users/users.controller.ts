@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,6 +21,10 @@ import { RequestUser } from 'src/user.decorator';
 import { UserDto } from './dtos/user.dto';
 import { Users } from '@prisma/client';
 import { PutUserDto } from './dtos/put-user.dto';
+import {
+  GetPresignedUrlRequestDto,
+  GetPresignedUrlResponseDto,
+} from '@libs/s3';
 
 @Controller('users')
 @ApiBearerAuth()
@@ -58,5 +63,15 @@ export class UsersController {
   @UseGuards(JwtGuard)
   async deleteUser(@RequestUser() user: Users) {
     return this.usersService.deleteUser(user.id);
+  }
+
+  @Get('presigned-urls')
+  @ApiOperation({ summary: 'get presigned url' })
+  @ApiResponse({ type: GetPresignedUrlResponseDto })
+  getUsersPreSignedUrls(
+    @Query() { count }: GetPresignedUrlRequestDto,
+    @RequestUser() { id }: Users,
+  ) {
+    return this.usersService.getPreSignedUrls(id, count);
   }
 }
