@@ -6,7 +6,7 @@ import { PostUserDto } from './dtos/post-user.dto';
 import { $Enums } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from 'src/auth/auth.service';
-import { PutUserResponseDto } from './dtos/put-user.dto';
+import { PutUserDto } from './dtos/put-user.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -76,10 +76,10 @@ export class UsersService {
     });
   }
 
-  public updateUser(id: string, dto: PutUserResponseDto) {
+  public updateUser(id: string, dto: PutUserDto) {
     return this.prismaService.users.update({
       where: { id },
-      data: { nickname: dto.nickname },
+      data: { nickname: dto.nickname, profileImageUrl: dto.profileImageUrl },
     });
   }
 

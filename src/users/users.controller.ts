@@ -19,7 +19,7 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { RequestUser } from 'src/user.decorator';
 import { UserDto } from './dtos/user.dto';
 import { Users } from '@prisma/client';
-import { PutUserResponseDto } from './dtos/put-user.dto';
+import { PutUserDto } from './dtos/put-user.dto';
 
 @Controller('users')
 @ApiBearerAuth()
@@ -45,10 +45,10 @@ export class UsersController {
 
   @ApiOperation({ summary: '유저 수정' })
   @ApiResponse({ type: PostUserResponseDto })
-  @ApiBody({ type: PutUserResponseDto, required: false })
+  @ApiBody({ type: PutUserDto, required: false })
   @Put()
   @UseGuards(JwtGuard)
-  updateUser(@RequestUser() user: Users, @Body() body: PutUserResponseDto) {
+  updateUser(@RequestUser() user: Users, @Body() body: PutUserDto) {
     return this.usersService.updateUser(user.id, body);
   }
 
