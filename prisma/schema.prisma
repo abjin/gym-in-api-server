@@ -14,12 +14,13 @@ datasource db {
 }
 
 model Users {
-  id        String      @id
-  nickname  String
-  accounts  Accounts[]  @relation("userToAccount")
-  feeds     Feeds[]     @relation("userToFeed")
-  comments  Comments[]  @relation("userToComment")
-  feedLikes FeedLikes[] @relation("userToFeedLike")
+  id              String      @id
+  nickname        String
+  profileImageUrl String?
+  accounts        Accounts[]  @relation("userToAccount")
+  feeds           Feeds[]     @relation("userToFeed")
+  comments        Comments[]  @relation("userToComment")
+  feedLikes       FeedLikes[] @relation("userToFeedLike")
 }
 
 model Accounts {
