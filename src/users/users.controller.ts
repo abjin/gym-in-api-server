@@ -68,6 +68,7 @@ export class UsersController {
   @Get('presigned-urls')
   @ApiOperation({ summary: 'get presigned url' })
   @ApiResponse({ type: GetPresignedUrlResponseDto })
+  @UseGuards(JwtGuard)
   getUsersPreSignedUrls(
     @Query() { count }: GetPresignedUrlRequestDto,
     @RequestUser() { id }: Users,
