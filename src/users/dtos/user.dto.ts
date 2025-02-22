@@ -10,4 +10,7 @@ export class UserDto {
 
   @ApiProperty({ description: '닉네임', type: String })
   nickname: string;
+
+  @ApiProperty({ description: '프로필 이미지 URL', type: String })
+  profileImageUrl: string;
 }
