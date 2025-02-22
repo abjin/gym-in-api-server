@@ -15,7 +15,7 @@ export class PostUserDto {
   })
   @IsString()
   @IsOptional()
-  nickname: string = '프로틴 쉐이크';
+  nickname?: string;
 }
 
 export class PostUserResponseDto {

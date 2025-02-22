@@ -63,7 +63,7 @@ export class UsersService {
   private async signUp(dto: PostUserDto, snsUser: SnsUser) {
     return this.prismaService.$transaction(async (prisma) => {
       const id = uuidv4();
-      const nickname = dto.nickname || snsUser.nickname;
+      const nickname = dto.nickname || snsUser.nickname || '프로틴 쉐이크';
       const user = await prisma.users.create({ data: { id, nickname } });
       await prisma.accounts.create({
         data: {
