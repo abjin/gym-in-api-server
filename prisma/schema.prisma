@@ -43,7 +43,7 @@ model Feeds {
   likeCounts    Int         @default(0)
   comments      Comments[]  @relation("feedToComment")
   likes         FeedLikes[] @relation("feedToLike")
-  author        Users?      @relation("userToFeed", fields: [owner], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  author        Users       @relation("userToFeed", fields: [owner], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model FeedLikes {
@@ -51,7 +51,7 @@ model FeedLikes {
   userId    String
   createdAt DateTime @default(now())
   feed      Feeds    @relation("feedToLike", fields: [feedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user      Users?   @relation("userToFeedLike", fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  user      Users    @relation("userToFeedLike", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([feedId, userId])
 }
@@ -63,7 +63,7 @@ model Comments {
   content    String
   likeCounts Int      @default(0)
   createdAt  DateTime @default(now())
-  author     Users?   @relation("userToComment", fields: [owner], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  author     Users    @relation("userToComment", fields: [owner], references: [id], onDelete: Cascade, onUpdate: Cascade)
   feed       Feeds    @relation("feedToComment", fields: [feedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
