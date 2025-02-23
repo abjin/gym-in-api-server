@@ -32,6 +32,13 @@ export class AttendancesController {
     return this.attendancesService.getPreSignedUrls(id, count);
   }
 
+  @Get('latest')
+  @ApiOperation({ summary: 'get latest attendance' })
+  @ApiResponse({ type: AttendanceResponseDto })
+  getLatestAttendance(@RequestUser() { id }: Users) {
+    return this.attendancesService.getLatestAttendance(id);
+  }
+
   @Post('check-in')
   @ApiOperation({ summary: 'check in' })
   @ApiResponse({ type: CheckInResponseDto })
@@ -60,12 +67,5 @@ export class AttendancesController {
     @RequestUser() { id }: Users,
   ) {
     return this.attendancesService.getAttendances(id, date);
-  }
-
-  @Get('latest')
-  @ApiOperation({ summary: 'get latest attendance' })
-  @ApiResponse({ type: AttendanceResponseDto })
-  getLatestAttendance(@RequestUser() { id }: Users) {
-    return this.attendancesService.getLatestAttendance(id);
   }
 }
