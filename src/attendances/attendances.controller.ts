@@ -39,7 +39,7 @@ export class AttendancesController {
   }
 
   @Post()
-  @ApiOperation({ summary: '출석 기록 생성' })
+  @ApiOperation({ summary: 'create attendance' })
   @ApiResponse({ type: CreateAttendanceResponseDto })
   createAttendance(
     @Body() body: CreateAttendanceRequestDto,
