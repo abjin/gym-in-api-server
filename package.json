@@ -39,6 +39,7 @@
     "dayjs": "^1.11.13",
     "express-basic-auth": "^1.2.1",
     "ioredis": "^5.4.2",
+    "openai": "^4.85.4",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
@@ -89,7 +90,8 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@libs/s3(|/.*)$": "<rootDir>/libs/s3/src/$1"
+      "^@libs/s3(|/.*)$": "<rootDir>/libs/s3/src/$1",
+      "^@libs/openrouter(|/.*)$": "<rootDir>/libs/openrouter/src/$1"
     }
   }
 }

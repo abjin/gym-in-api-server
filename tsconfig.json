@@ -36,6 +36,12 @@
       ],
       "@libs/date/*": [
         "libs/date/src/*"
+      ],
+      "@libs/openrouter": [
+        "libs/openrouter/src"
+      ],
+      "@libs/openrouter/*": [
+        "libs/openrouter/src/*"
       ]
     }
   }

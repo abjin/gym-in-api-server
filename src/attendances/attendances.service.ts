@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'db/prisma.service';
-import { CheckInRequestDto } from './dtos';
+import { CheckInRequestDto, CheckInResponseDto } from './dtos';
 import { S3Service } from '@libs/s3';
+import { OpenrouterService } from '@libs/openrouter';
+
 @Injectable()
 export class AttendancesService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
+    private readonly openrouterService: OpenrouterService,
   ) {}
 
   getPreSignedUrls(userId: string, count = 1) {
@@ -22,7 +25,7 @@ export class AttendancesService {
     return result;
   }
 
-  async checkIn(body: CheckInRequestDto, userId: string) {
-    return { body, userId };
+  async checkIn(body: CheckInRequestDto): Promise<CheckInResponseDto> {
+    return this.openrouterService.validateGymImage(body.imageUrl);
   }
 }

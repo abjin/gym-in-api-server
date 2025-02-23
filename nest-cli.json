@@ -24,6 +24,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/date/tsconfig.lib.json"
       }
+    },
+    "openrouter": {
+      "type": "library",
+      "root": "libs/openrouter",
+      "entryFile": "index",
+      "sourceRoot": "libs/openrouter/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/openrouter/tsconfig.lib.json"
+      }
     }
   }
 }

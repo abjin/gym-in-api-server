@@ -29,7 +29,7 @@ export class CheckInRequestDto {
 export class CheckInResponseDto {
   @ApiProperty({
     description: '출석 상태',
-    enum: ['fail', 'success', 'pending'],
+    type: Boolean,
   })
-  status: 'fail' | 'success' | 'pending';
+  result: boolean;
 }

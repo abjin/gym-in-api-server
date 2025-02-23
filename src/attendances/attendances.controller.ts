@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AttendancesService } from './attendances.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { CheckInRequestDto } from './dtos';
+import { CheckInRequestDto, CheckInResponseDto } from './dtos';
 import {
   GetPresignedUrlRequestDto,
   GetPresignedUrlResponseDto,
@@ -28,7 +28,8 @@ export class AttendancesController {
 
   @Post('check-in')
   @ApiOperation({ summary: 'check in' })
-  checkIn(@Body() body: CheckInRequestDto, @RequestUser() { id }: Users) {
-    return this.attendancesService.checkIn(body, id);
+  @ApiResponse({ type: CheckInResponseDto })
+  checkIn(@Body() body: CheckInRequestDto): Promise<CheckInResponseDto> {
+    return this.attendancesService.checkIn(body);
   }
 }
