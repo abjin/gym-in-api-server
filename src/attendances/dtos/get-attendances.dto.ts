@@ -5,14 +5,14 @@ import { DateService } from '@libs/date';
 
 export class GetAttendancesRequestDto {
   @ApiProperty({
-    description: '월',
-    type: Number,
-    format: 'YYYY-MM',
-    default: DateService.getDateString({ format: 'YYYY-MM' }),
+    description: '날짜',
+    type: String,
+    format: 'YYYY-MM-DD',
+    default: DateService.getDateString({ format: 'YYYY-MM-DD' }),
   })
   @IsString()
   @IsOptional()
-  month?: string = DateService.getDateString({ format: 'YYYY-MM' });
+  date?: string = DateService.getDateString({ format: 'YYYY-MM-DD' });
 }
 
 export class GetAttendancesResponseDto {

@@ -12,11 +12,11 @@ export class GetMonthlyGoalRequestDto {
     description: '날짜',
     type: String,
     required: false,
-    default: DateService.getDateString({ format: 'YYYY-MM' }),
+    default: DateService.getDateString({ format: 'YYYY-MM-DD' }),
   })
   @IsDateString()
   @IsOptional()
-  month?: string = DateService.getDateString({ format: 'YYYY-MM' });
+  date?: string = DateService.getDateString({ format: 'YYYY-MM-DD' });
 }
 
 export class MonthlyGoalResponseDto {
