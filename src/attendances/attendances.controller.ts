@@ -35,8 +35,11 @@ export class AttendancesController {
   @Post('check-in')
   @ApiOperation({ summary: 'check in' })
   @ApiResponse({ type: CheckInResponseDto })
-  checkIn(@Body() body: CheckInRequestDto): Promise<CheckInResponseDto> {
-    return this.attendancesService.checkIn(body);
+  checkIn(
+    @Body() body: CheckInRequestDto,
+    @RequestUser() user: Users,
+  ): Promise<CheckInResponseDto> {
+    return this.attendancesService.checkIn(body, user.id);
   }
 
   @Post()

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'db/prisma.service';
 import {
   CheckInRequestDto,
@@ -31,7 +31,18 @@ export class AttendancesService {
     return result;
   }
 
-  async checkIn(body: CheckInRequestDto): Promise<CheckInResponseDto> {
+  async checkIn(
+    body: CheckInRequestDto,
+    owner: string,
+  ): Promise<CheckInResponseDto> {
+    const attendance = await this.prismaService.attendances.findUnique({
+      where: { owner_date: { owner, date: new Date(body.date) } },
+    });
+
+    if (attendance) {
+      throw new ConflictException('이미 출석체크를 했습니다.');
+    }
+
     return this.openrouterService.validateGymImage(body.imageUrl);
   }
 
