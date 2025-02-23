@@ -129,7 +129,7 @@ model Attendances {
   date      DateTime @db.Date
   createdAt DateTime @default(now())
 
-  user      Users       @relation("userToAttendance", fields: [owner], references: [id])
+  user      Users       @relation("userToAttendance", fields: [owner], references: [id], onDelete: Cascade, onUpdate: Cascade)
   exercises Exercises[] @relation("attendanceToExercise")
 
   @@unique([owner, date])
@@ -139,7 +139,7 @@ model Exercises {
   attendanceId Int
   type         ExerciseType
 
-  attendance Attendances @relation("attendanceToExercise", fields: [attendanceId], references: [id])
+  attendance Attendances @relation("attendanceToExercise", fields: [attendanceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([attendanceId, type])
 }
