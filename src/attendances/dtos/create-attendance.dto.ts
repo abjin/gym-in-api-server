@@ -34,7 +34,7 @@ export class ExerciseDto {
   type: string;
 }
 
-export class CreateAttendanceResponseDto {
+export class AttendanceResponseDto {
   @ApiProperty({ description: '출석 ID', type: Number })
   id: number;
 

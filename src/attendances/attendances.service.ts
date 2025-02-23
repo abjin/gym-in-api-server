@@ -4,7 +4,7 @@ import {
   CheckInRequestDto,
   CheckInResponseDto,
   CreateAttendanceRequestDto,
-  CreateAttendanceResponseDto,
+  AttendanceResponseDto,
 } from './dtos';
 import { S3Service } from '@libs/s3';
 import { OpenrouterService } from '@libs/openrouter';
@@ -49,7 +49,7 @@ export class AttendancesService {
   async createAttendance(
     owner: string,
     body: CreateAttendanceRequestDto,
-  ): Promise<CreateAttendanceResponseDto> {
+  ): Promise<AttendanceResponseDto> {
     return await this.prismaService.attendances.create({
       select: this.prismaService.attendanceSelect,
       data: {
@@ -63,13 +63,21 @@ export class AttendancesService {
   async getAttendances(
     owner: string,
     date: string,
-  ): Promise<CreateAttendanceResponseDto[]> {
+  ): Promise<AttendanceResponseDto[]> {
     const startOfMonth = new Date(DateService.getStartOfMonthString(date));
     const endOfMonth = new Date(DateService.getEndOfMonthString(date));
 
     return this.prismaService.attendances.findMany({
       select: this.prismaService.attendanceSelect,
       where: { owner, date: { gte: startOfMonth, lte: endOfMonth } },
+    });
+  }
+
+  async getLatestAttendance(owner: string): Promise<AttendanceResponseDto> {
+    return this.prismaService.attendances.findFirst({
+      select: this.prismaService.attendanceSelect,
+      where: { owner },
+      orderBy: { date: 'desc' },
     });
   }
 }

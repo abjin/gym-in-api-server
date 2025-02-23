@@ -6,7 +6,7 @@ import {
   CheckInRequestDto,
   CheckInResponseDto,
   CreateAttendanceRequestDto,
-  CreateAttendanceResponseDto,
+  AttendanceResponseDto,
   GetAttendancesRequestDto,
 } from './dtos';
 import {
@@ -44,21 +44,28 @@ export class AttendancesController {
 
   @Post()
   @ApiOperation({ summary: 'create attendance' })
-  @ApiResponse({ type: CreateAttendanceResponseDto })
+  @ApiResponse({ type: AttendanceResponseDto })
   createAttendance(
     @Body() body: CreateAttendanceRequestDto,
     @RequestUser() { id }: Users,
-  ): Promise<CreateAttendanceResponseDto> {
+  ): Promise<AttendanceResponseDto> {
     return this.attendancesService.createAttendance(id, body);
   }
 
   @Get()
   @ApiOperation({ summary: 'get attendances' })
-  @ApiResponse({ type: [CreateAttendanceResponseDto] })
+  @ApiResponse({ type: [AttendanceResponseDto] })
   getAttendances(
     @Query() { date }: GetAttendancesRequestDto,
     @RequestUser() { id }: Users,
   ) {
     return this.attendancesService.getAttendances(id, date);
+  }
+
+  @Get('latest')
+  @ApiOperation({ summary: 'get latest attendance' })
+  @ApiResponse({ type: AttendanceResponseDto })
+  getLatestAttendance(@RequestUser() { id }: Users) {
+    return this.attendancesService.getLatestAttendance(id);
   }
 }
