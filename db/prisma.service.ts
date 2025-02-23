@@ -50,4 +50,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     endDate: true,
     rewards: true,
   };
+
+  public readonly attendanceSelect = {
+    id: true,
+    owner: true,
+    date: true,
+    createdAt: true,
+    exercises: true,
+  };
 }

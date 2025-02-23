@@ -14,13 +14,14 @@ datasource db {
 }
 
 model Users {
-  id              String      @id
+  id              String        @id
   nickname        String
   profileImageUrl String?
-  accounts        Accounts[]  @relation("userToAccount")
-  feeds           Feeds[]     @relation("userToFeed")
-  comments        Comments[]  @relation("userToComment")
-  feedLikes       FeedLikes[] @relation("userToFeedLike")
+  accounts        Accounts[]    @relation("userToAccount")
+  feeds           Feeds[]       @relation("userToFeed")
+  comments        Comments[]    @relation("userToComment")
+  feedLikes       FeedLikes[]   @relation("userToFeedLike")
+  attendances     Attendances[] @relation("userToAttendance")
 }
 
 model Accounts {
@@ -120,6 +121,36 @@ model ChallengeCertificationLogs {
   participant   ChallengeParticipants @relation("participantToCertificationLog", fields: [participantId], references: [participantId], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([participantId, date])
+}
+
+model Attendances {
+  id        Int      @id @default(autoincrement())
+  owner     String
+  date      DateTime @db.Date
+  createdAt DateTime @default(now())
+
+  user      Users       @relation("userToAttendance", fields: [owner], references: [id])
+  exercises Exercises[] @relation("attendanceToExercise")
+
+  @@unique([owner, date])
+}
+
+model Exercises {
+  attendanceId Int
+  type         ExerciseType
+
+  attendance Attendances @relation("attendanceToExercise", fields: [attendanceId], references: [id])
+
+  @@id([attendanceId, type])
+}
+
+enum ExerciseType {
+  chest
+  back
+  shoulder
+  arm
+  leg
+  cardio
 }
 
 enum AccountType {

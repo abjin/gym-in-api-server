@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'db/prisma.service';
-import { CheckInRequestDto, CheckInResponseDto } from './dtos';
+import {
+  CheckInRequestDto,
+  CheckInResponseDto,
+  CreateAttendanceRequestDto,
+  CreateAttendanceResponseDto,
+} from './dtos';
 import { S3Service } from '@libs/s3';
 import { OpenrouterService } from '@libs/openrouter';
 
@@ -27,5 +32,15 @@ export class AttendancesService {
 
   async checkIn(body: CheckInRequestDto): Promise<CheckInResponseDto> {
     return this.openrouterService.validateGymImage(body.imageUrl);
+  }
+
+  async createAttendance(
+    owner: string,
+    body: CreateAttendanceRequestDto,
+  ): Promise<CreateAttendanceResponseDto> {
+    return await this.prismaService.attendances.create({
+      select: this.prismaService.attendanceSelect,
+      data: { owner, date: body.date },
+    });
   }
 }
