@@ -31,7 +31,7 @@ import {
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @ApiOperation({ summary: '카카오 로그인' })
+  @ApiOperation({ summary: 'Kakao Login' })
   @ApiBody({ type: PostUserDto })
   @ApiResponse({ type: PostUserResponseDto })
   @Post('kakao-login')
@@ -40,7 +40,7 @@ export class UsersController {
     return this.usersService.signInOrUp(body, snsUser);
   }
 
-  @ApiOperation({ summary: '유저 조회' })
+  @ApiOperation({ summary: 'Get User Info' })
   @ApiResponse({ type: UserDto })
   @Get()
   @UseGuards(JwtGuard)
@@ -48,7 +48,7 @@ export class UsersController {
     return user;
   }
 
-  @ApiOperation({ summary: '유저 수정' })
+  @ApiOperation({ summary: 'Update User' })
   @ApiResponse({ type: PostUserResponseDto })
   @ApiBody({ type: PutUserDto, required: false })
   @Put()
@@ -57,7 +57,7 @@ export class UsersController {
     return this.usersService.updateUser(user.id, body);
   }
 
-  @ApiOperation({ summary: '유저 탈퇴' })
+  @ApiOperation({ summary: 'Delete User' })
   @Delete()
   @ApiResponse({ type: UserDto })
   @UseGuards(JwtGuard)
@@ -66,7 +66,7 @@ export class UsersController {
   }
 
   @Get('presigned-urls')
-  @ApiOperation({ summary: 'get presigned url' })
+  @ApiOperation({ summary: 'Get Presigned URL' })
   @ApiResponse({ type: GetPresignedUrlResponseDto })
   @UseGuards(JwtGuard)
   getUsersPreSignedUrls(
