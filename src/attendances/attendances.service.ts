@@ -42,7 +42,7 @@ export class AttendancesService {
       select: this.prismaService.attendanceSelect,
       data: {
         owner,
-        date: body.date,
+        date: new Date(body.date),
         exercises: { create: body.exercises.map((type) => ({ type })) },
       },
     });
