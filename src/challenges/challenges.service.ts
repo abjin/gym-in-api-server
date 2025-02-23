@@ -136,7 +136,7 @@ export class ChallengesService {
   private updateChallengeCertificationQueryBuilder(
     participant: ChallengeParticipants,
   ) {
-    if (participant.updatedAt > DateService.getStartOfDayUTC()) return null;
+    if (participant.updatedAt > DateService.getStartOfDay()) return null;
 
     const successDays = participant.successDays + 1;
     const updatedAt = new Date();

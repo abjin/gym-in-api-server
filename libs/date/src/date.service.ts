@@ -19,7 +19,23 @@ export class DateService {
     return dayjs().tz(timeZone).format(format);
   }
 
-  static getStartOfDayUTC(timeZone: string = defaultTimeZone): Date {
-    return dayjs().tz(timeZone).startOf('day').utc().toDate();
+  static getStartOfDay(date?: Date, timeZone: string = defaultTimeZone): Date {
+    return dayjs(date).tz(timeZone).startOf('day').utc().toDate();
+  }
+
+  static getStartOfMonthString(
+    date: Date | string = new Date(),
+    timeZone: string = defaultTimeZone,
+    format = 'YYYY-MM-DD',
+  ): string {
+    return dayjs(date).tz(timeZone).startOf('month').format(format);
+  }
+
+  static getEndOfMonthString(
+    date: Date | string = new Date(),
+    timeZone: string = defaultTimeZone,
+    format = 'YYYY-MM-DD',
+  ): string {
+    return dayjs(date).tz(timeZone).endOf('month').format(format);
   }
 }

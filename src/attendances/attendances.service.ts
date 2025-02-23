@@ -8,6 +8,7 @@ import {
 } from './dtos';
 import { S3Service } from '@libs/s3';
 import { OpenrouterService } from '@libs/openrouter';
+import { DateService } from '@libs/date';
 
 @Injectable()
 export class AttendancesService {
@@ -45,6 +46,19 @@ export class AttendancesService {
         date: new Date(body.date),
         exercises: { create: body.exercises.map((type) => ({ type })) },
       },
+    });
+  }
+
+  async getAttendances(
+    owner: string,
+    date: string,
+  ): Promise<CreateAttendanceResponseDto[]> {
+    const startOfMonth = new Date(DateService.getStartOfMonthString(date));
+    const endOfMonth = new Date(DateService.getEndOfMonthString(date));
+
+    return this.prismaService.attendances.findMany({
+      select: this.prismaService.attendanceSelect,
+      where: { owner, date: { gte: startOfMonth, lte: endOfMonth } },
     });
   }
 }

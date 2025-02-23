@@ -7,6 +7,7 @@ import {
   CheckInResponseDto,
   CreateAttendanceRequestDto,
   CreateAttendanceResponseDto,
+  GetAttendancesRequestDto,
 } from './dtos';
 import {
   GetPresignedUrlRequestDto,
@@ -46,5 +47,15 @@ export class AttendancesController {
     @RequestUser() { id }: Users,
   ): Promise<CreateAttendanceResponseDto> {
     return this.attendancesService.createAttendance(id, body);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'get attendances' })
+  @ApiResponse({ type: [CreateAttendanceResponseDto] })
+  getAttendances(
+    @Query() { date }: GetAttendancesRequestDto,
+    @RequestUser() { id }: Users,
+  ) {
+    return this.attendancesService.getAttendances(id, date);
   }
 }
