@@ -40,7 +40,11 @@ export class AttendancesService {
   ): Promise<CreateAttendanceResponseDto> {
     return await this.prismaService.attendances.create({
       select: this.prismaService.attendanceSelect,
-      data: { owner, date: body.date },
+      data: {
+        owner,
+        date: body.date,
+        exercises: { create: body.exercises.map((type) => ({ type })) },
+      },
     });
   }
 }

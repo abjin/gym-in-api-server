@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsOptional } from 'class-validator';
 import { DateService } from '@libs/date';
 import { Transform } from 'class-transformer';
+import { $Enums } from '@prisma/client';
 
 export class CreateAttendanceRequestDto {
   @ApiProperty({
@@ -13,6 +14,9 @@ export class CreateAttendanceRequestDto {
   @IsDateString()
   @IsOptional()
   date?: string = DateService.getDateString({ format: 'YYYY-MM-DD' });
+
+  @ApiProperty({ description: '운동 목록', enum: $Enums.ExerciseType })
+  exercises: $Enums.ExerciseType[];
 }
 
 export class ExerciseDto {
