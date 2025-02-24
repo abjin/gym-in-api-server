@@ -14,14 +14,15 @@ datasource db {
 }
 
 model Users {
-  id              String        @id
+  id              String            @id
   nickname        String
   profileImageUrl String?
-  accounts        Accounts[]    @relation("userToAccount")
-  feeds           Feeds[]       @relation("userToFeed")
-  comments        Comments[]    @relation("userToComment")
-  feedLikes       FeedLikes[]   @relation("userToFeedLike")
-  attendances     Attendances[] @relation("userToAttendance")
+  accounts        Accounts[]        @relation("userToAccount")
+  feeds           Feeds[]           @relation("userToFeed")
+  comments        Comments[]        @relation("userToComment")
+  feedLikes       FeedLikes[]       @relation("userToFeedLike")
+  attendances     Attendances[]     @relation("userToAttendance")
+  attendanceGoals AttendanceGoals[] @relation("userToAttendanceGoal")
 }
 
 model Accounts {
@@ -142,6 +143,23 @@ model Exercises {
   attendance Attendances @relation("attendanceToExercise", fields: [attendanceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([attendanceId, type])
+}
+
+model AttendanceGoals {
+  owner     String
+  type      AttendanceGoalType
+  startDate DateTime           @db.Date
+  endDate   DateTime           @db.Date
+  goal      Int
+
+  user Users @relation("userToAttendanceGoal", fields: [owner], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([owner, type, startDate, endDate])
+}
+
+enum AttendanceGoalType {
+  monthly
+  weekly
 }
 
 enum ExerciseType {

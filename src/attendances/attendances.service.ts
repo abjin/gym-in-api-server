@@ -5,10 +5,13 @@ import {
   CheckInResponseDto,
   CreateAttendanceRequestDto,
   AttendanceResponseDto,
+  CreateAttendanceGoalRequestDto,
+  AttendanceGoalResponseDto,
 } from './dtos';
 import { S3Service } from '@libs/s3';
 import { OpenrouterService } from '@libs/openrouter';
 import { DateService } from '@libs/date';
+import { $Enums } from '@prisma/client';
 
 @Injectable()
 export class AttendancesService {
@@ -78,6 +81,68 @@ export class AttendancesService {
       select: this.prismaService.attendanceSelect,
       where: { owner },
       orderBy: { date: 'desc' },
+    });
+  }
+
+  private async getAttendanceGoalRange(
+    type: $Enums.AttendanceGoalType,
+    date: string,
+  ): Promise<{ startDate: Date; endDate: Date }> {
+    let startDate: Date;
+    let endDate: Date;
+
+    if (type === $Enums.AttendanceGoalType.monthly) {
+      startDate = new Date(DateService.getStartOfMonthString(date));
+      endDate = new Date(DateService.getEndOfMonthString(date));
+    } else {
+      startDate = new Date(DateService.getStartOfWeekString(date));
+      endDate = new Date(DateService.getEndOfWeekString(date));
+    }
+
+    return { startDate, endDate };
+  }
+
+  async createAttendanceGoal({
+    body: { date, goal },
+    type,
+    owner,
+  }: {
+    body: CreateAttendanceGoalRequestDto;
+    type: $Enums.AttendanceGoalType;
+    owner: string;
+  }): Promise<AttendanceGoalResponseDto> {
+    const range = await this.getAttendanceGoalRange(type, date);
+
+    return this.prismaService.attendanceGoals.create({
+      data: {
+        owner,
+        type,
+        goal,
+        startDate: range.startDate,
+        endDate: range.endDate,
+      },
+    });
+  }
+
+  async getAttendanceGoals({
+    owner,
+    type,
+    date,
+  }: {
+    owner: string;
+    type: $Enums.AttendanceGoalType;
+    date: string;
+  }): Promise<AttendanceGoalResponseDto> {
+    const range = await this.getAttendanceGoalRange(type, date);
+    return this.prismaService.attendanceGoals.findUnique({
+      where: {
+        owner_type_startDate_endDate: {
+          owner,
+          type,
+          startDate: range.startDate,
+          endDate: range.endDate,
+        },
+      },
     });
   }
 }

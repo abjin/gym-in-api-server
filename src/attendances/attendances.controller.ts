@@ -8,19 +8,22 @@ import {
   CreateAttendanceRequestDto,
   AttendanceResponseDto,
   GetAttendancesRequestDto,
+  AttendanceGoalResponseDto,
+  CreateAttendanceGoalRequestDto,
+  GetAttendanceGoalRequestDto,
 } from './dtos';
 import {
   GetPresignedUrlRequestDto,
   GetPresignedUrlResponseDto,
 } from '@libs/s3';
-import { Users } from '@prisma/client';
+import { $Enums, Users } from '@prisma/client';
 import { RequestUser } from 'src/user.decorator';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
 @Controller('attendances')
 export class AttendancesController {
-  constructor(private readonly attendancesService: AttendancesService) {}
+  constructor(private readonly service: AttendancesService) {}
 
   @Get('presigned-urls')
   @ApiResponse({ type: GetPresignedUrlResponseDto })
@@ -29,14 +32,14 @@ export class AttendancesController {
     @Query() { count }: GetPresignedUrlRequestDto,
     @RequestUser() { id }: Users,
   ) {
-    return this.attendancesService.getPreSignedUrls(id, count);
+    return this.service.getPreSignedUrls(id, count);
   }
 
   @Get('latest')
   @ApiOperation({ summary: 'get latest attendance' })
   @ApiResponse({ type: AttendanceResponseDto })
   getLatestAttendance(@RequestUser() { id }: Users) {
-    return this.attendancesService.getLatestAttendance(id);
+    return this.service.getLatestAttendance(id);
   }
 
   @Post('check-in')
@@ -46,7 +49,7 @@ export class AttendancesController {
     @Body() body: CheckInRequestDto,
     @RequestUser() user: Users,
   ): Promise<CheckInResponseDto> {
-    return this.attendancesService.checkIn(body, user.id);
+    return this.service.checkIn(body, user.id);
   }
 
   @Post()
@@ -56,7 +59,7 @@ export class AttendancesController {
     @Body() body: CreateAttendanceRequestDto,
     @RequestUser() { id }: Users,
   ): Promise<AttendanceResponseDto> {
-    return this.attendancesService.createAttendance(id, body);
+    return this.service.createAttendance(id, body);
   }
 
   @Get()
@@ -66,6 +69,66 @@ export class AttendancesController {
     @Query() { date }: GetAttendancesRequestDto,
     @RequestUser() { id }: Users,
   ) {
-    return this.attendancesService.getAttendances(id, date);
+    return this.service.getAttendances(id, date);
+  }
+
+  @Post('monthly-goals')
+  @ApiOperation({ summary: 'create monthly goal' })
+  @ApiResponse({ type: AttendanceGoalResponseDto })
+  async createMonthlyGoal(
+    @Body() body: CreateAttendanceGoalRequestDto,
+    @RequestUser() { id: owner }: Users,
+  ) {
+    const result = await this.service.createAttendanceGoal({
+      type: $Enums.AttendanceGoalType.monthly,
+      body,
+      owner,
+    });
+    return new AttendanceGoalResponseDto(result);
+  }
+
+  @Post('weekly-goals')
+  @ApiOperation({ summary: 'create weekly goal' })
+  @ApiResponse({ type: AttendanceGoalResponseDto })
+  async createWeeklyGoal(
+    @Body() body: CreateAttendanceGoalRequestDto,
+    @RequestUser() { id: owner }: Users,
+  ) {
+    const result = await this.service.createAttendanceGoal({
+      type: $Enums.AttendanceGoalType.weekly,
+      body,
+      owner,
+    });
+    return new AttendanceGoalResponseDto(result);
+  }
+
+  @Get('monthly-goals')
+  @ApiOperation({ summary: 'get monthly goals' })
+  @ApiResponse({ type: [AttendanceGoalResponseDto] })
+  async getMonthlyGoals(
+    @RequestUser() { id: owner }: Users,
+    @Query() { date }: GetAttendanceGoalRequestDto,
+  ) {
+    const result = await this.service.getAttendanceGoals({
+      type: $Enums.AttendanceGoalType.monthly,
+      owner,
+      date,
+    });
+    return new AttendanceGoalResponseDto(result);
+  }
+
+  @Get('weekly-goals')
+  @ApiOperation({ summary: 'get weekly goals' })
+  @ApiResponse({ type: [AttendanceGoalResponseDto] })
+  async getWeeklyGoals(
+    @RequestUser() { id: owner }: Users,
+    @Query() { date }: GetAttendanceGoalRequestDto,
+  ) {
+    const result = await this.service.getAttendanceGoals({
+      type: $Enums.AttendanceGoalType.weekly,
+      owner,
+      date,
+    });
+    return new AttendanceGoalResponseDto(result);
   }
 }
