@@ -1,10 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsNumber, IsOptional } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, Min } from 'class-validator';
 import { DateService } from '@libs/date';
+import { Transform } from 'class-transformer';
 
 export class CreateAttendanceGoalRequestDto {
-  @ApiProperty({ description: '월간 목표 횟수', type: Number })
+  @ApiProperty({
+    description: '월간 목표 횟수',
+    type: Number,
+    minimum: 1,
+  })
   @IsNumber()
+  @Min(1)
   goal: number;
 
   @ApiProperty({
@@ -40,10 +46,12 @@ export class AttendanceGoalResponseDto {
   @ApiProperty({ description: '타입', type: String })
   type: string;
 
-  @ApiProperty({ description: '시작일', type: String })
+  @Transform(({ value }) => value.toISOString().split('T')[0])
+  @ApiProperty({ description: '시작일', type: String, format: 'YYYY-MM-DD' })
   startDate: Date;
 
-  @ApiProperty({ description: '종료일', type: Date })
+  @Transform(({ value }) => value.toISOString().split('T')[0])
+  @ApiProperty({ description: '종료일', type: String, format: 'YYYY-MM-DD' })
   endDate: Date;
 
   constructor(partial: Partial<AttendanceGoalResponseDto>) {

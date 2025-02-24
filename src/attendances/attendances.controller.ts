@@ -104,7 +104,7 @@ export class AttendancesController {
 
   @Get('monthly-goals')
   @ApiOperation({ summary: 'get monthly goals' })
-  @ApiResponse({ type: [AttendanceGoalResponseDto] })
+  @ApiResponse({ type: AttendanceGoalResponseDto })
   async getMonthlyGoals(
     @RequestUser() { id: owner }: Users,
     @Query() { date }: GetAttendanceGoalRequestDto,
@@ -114,12 +114,12 @@ export class AttendancesController {
       owner,
       date,
     });
-    return new AttendanceGoalResponseDto(result);
+    return result ? new AttendanceGoalResponseDto(result) : null;
   }
 
   @Get('weekly-goals')
   @ApiOperation({ summary: 'get weekly goals' })
-  @ApiResponse({ type: [AttendanceGoalResponseDto] })
+  @ApiResponse({ type: AttendanceGoalResponseDto })
   async getWeeklyGoals(
     @RequestUser() { id: owner }: Users,
     @Query() { date }: GetAttendanceGoalRequestDto,
@@ -129,6 +129,6 @@ export class AttendancesController {
       owner,
       date,
     });
-    return new AttendanceGoalResponseDto(result);
+    return result ? new AttendanceGoalResponseDto(result) : null;
   }
 }
