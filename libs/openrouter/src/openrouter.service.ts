@@ -16,7 +16,7 @@ export class OpenrouterService {
         {
           role: 'system',
           content:
-            'You are an AI that analyzes images to determine if they show a gym or fitness center. Respond with JSON format {result: true/false}.',
+            'You are an AI that analyzes images to determine if they show a real, physical gym or fitness center currently in operation. Photos of gyms or drawings/illustrations of gyms should return {result: false}. Only return {result: true} if the image shows a real, operating gym or fitness center in its actual physical space. Respond with JSON format {result: true/false}.',
         },
         {
           role: 'user',
@@ -24,7 +24,7 @@ export class OpenrouterService {
             { type: 'image_url', image_url: { url: imageUrl } },
             {
               type: 'text',
-              text: 'Is this image a gym?',
+              text: 'Is this image showing a real, operating gym (not a photo or drawing of a gym)?',
             },
           ],
         },
