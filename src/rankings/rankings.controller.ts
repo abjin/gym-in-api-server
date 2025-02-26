@@ -19,7 +19,6 @@ export class RankingsController {
     @Query() { start, end }: GetRankingsRequestDto,
   ): Promise<RankingDto[]> {
     const result = await this.rankingsService.getRankings(start, end);
-
     return result.map((item) => new RankingDto(item));
   }
 

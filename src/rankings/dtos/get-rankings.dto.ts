@@ -19,13 +19,13 @@ export class GetRankingsRequestDto {
     description: '랭킹 종료 인덱스',
     type: Number,
     required: false,
-    default: 9,
+    default: 5,
   })
   @IsOptional()
   @IsInt()
   @Min(0)
   @Type(() => Number)
-  end?: number = 9;
+  end?: number = 5;
 }
 
 @Exclude()
