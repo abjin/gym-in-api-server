@@ -11,6 +11,7 @@ import {
   AttendanceGoalResponseDto,
   CreateAttendanceGoalRequestDto,
   GetAttendanceGoalRequestDto,
+  GetTotalAttendanceResponseDto,
 } from './dtos';
 import {
   GetPresignedUrlRequestDto,
@@ -130,5 +131,15 @@ export class AttendancesController {
       date,
     });
     return result ? new AttendanceGoalResponseDto(result) : null;
+  }
+
+  @Get('total')
+  @ApiOperation({ summary: 'get user total attendance count' })
+  @ApiResponse({ type: GetTotalAttendanceResponseDto })
+  async getTotalAttendance(
+    @RequestUser() { id: userId }: Users,
+  ): Promise<GetTotalAttendanceResponseDto> {
+    const totalAttendance = await this.service.getUserTotalAttendance(userId);
+    return { totalAttendance };
   }
 }

@@ -214,4 +214,11 @@ export class AttendancesService {
       },
     });
   }
+
+  async getUserTotalAttendance(userId: string): Promise<number> {
+    const totalAttendance = await this.prismaService.attendances.count({
+      where: { owner: userId },
+    });
+    return totalAttendance;
+  }
 }
