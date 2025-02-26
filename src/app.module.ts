@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { FeedsModule } from './feeds/feeds.module';
 import { ChallengesModule } from './challenges/challenges.module';
 import { AttendancesModule } from './attendances/attendances.module';
+import { LevelsModule } from './levels/levels.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AttendancesModule } from './attendances/attendances.module';
     FeedsModule,
     ChallengesModule,
     AttendancesModule,
+    LevelsModule,
   ],
   controllers: [AppController],
 })

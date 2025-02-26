@@ -14,15 +14,17 @@ datasource db {
 }
 
 model Users {
-  id              String            @id
-  nickname        String
-  profileImageUrl String?
-  accounts        Accounts[]        @relation("userToAccount")
-  feeds           Feeds[]           @relation("userToFeed")
-  comments        Comments[]        @relation("userToComment")
-  feedLikes       FeedLikes[]       @relation("userToFeedLike")
-  attendances     Attendances[]     @relation("userToAttendance")
-  attendanceGoals AttendanceGoals[] @relation("userToAttendanceGoal")
+  id                   String            @id
+  nickname             String
+  profileImageUrl      String?
+  totalExperiencePoint Int               @default(0)
+  accounts             Accounts[]        @relation("userToAccount")
+  feeds                Feeds[]           @relation("userToFeed")
+  comments             Comments[]        @relation("userToComment")
+  feedLikes            FeedLikes[]       @relation("userToFeedLike")
+  attendances          Attendances[]     @relation("userToAttendance")
+  attendanceGoals      AttendanceGoals[] @relation("userToAttendanceGoal")
+  levelLogs            LevelLogs[]       @relation("userToLevelLog")
 }
 
 model Accounts {
@@ -155,6 +157,24 @@ model AttendanceGoals {
   user Users @relation("userToAttendanceGoal", fields: [owner], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([owner, type, startDate, endDate])
+}
+
+model LevelLogs {
+  id        Int           @id @default(autoincrement())
+  userId    String
+  amount    Int
+  type      LevelLogType?
+  createdAt DateTime      @default(now())
+
+  user Users @relation("userToLevelLog", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+}
+
+enum LevelLogType {
+  attendance
+  attendanceGoal
+  challenge
 }
 
 enum AttendanceGoalType {

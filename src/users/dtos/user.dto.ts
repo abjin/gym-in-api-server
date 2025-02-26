@@ -13,4 +13,7 @@ export class UserDto {
 
   @ApiProperty({ description: '프로필 이미지 URL', type: String })
   profileImageUrl: string;
+
+  @ApiProperty({ description: '경험치', type: Number })
+  totalExperiencePoint: number;
 }
