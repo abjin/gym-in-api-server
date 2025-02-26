@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { IsInt, IsOptional, Min } from 'class-validator';
+import { Users } from '@prisma/client';
 
 export class GetRankingsRequestDto {
   @ApiProperty({
@@ -19,13 +20,13 @@ export class GetRankingsRequestDto {
     description: '랭킹 종료 인덱스',
     type: Number,
     required: false,
-    default: 5,
+    default: 9,
   })
   @IsOptional()
   @IsInt()
   @Min(0)
   @Type(() => Number)
-  end?: number = 5;
+  end?: number = 9;
 }
 
 @Exclude()
@@ -63,17 +64,35 @@ class RankingUserDto {
 
 export class RankingDto {
   @ApiProperty({ description: '사용자 ID', type: String })
+  @Expose()
   userId: string;
 
-  @ApiProperty({ description: '점수', type: Number })
+  @ApiProperty({ description: '총 점수', type: Number })
+  @Expose()
   score: number;
 
   @ApiProperty({ description: '랭킹', type: Number })
+  @Expose()
   rank: number;
 
-  @Type(() => RankingUserDto)
-  @ApiProperty({ description: '사용자 정보', type: RankingUserDto })
-  user: Partial<RankingUserDto>;
+  @ApiProperty({ description: '사용자 정보', type: Object })
+  @Expose()
+  user: Users;
+
+  @ApiProperty({ description: '목표 달성일 수', type: Number })
+  @Expose()
+  @Transform(({ obj }) => Math.floor(obj.score / 1000000))
+  achievedGoalDays: number;
+
+  @ApiProperty({ description: '출석일 수', type: Number })
+  @Expose()
+  @Transform(({ obj }) => Math.floor((obj.score % 1000000) / 10000))
+  attendanceDays: number;
+
+  @ApiProperty({ description: '획득 경험치', type: Number })
+  @Expose()
+  @Transform(({ obj }) => obj.score % 10000)
+  experiencePoint: number;
 
   constructor(partial: Partial<RankingDto>) {
     Object.assign(this, partial);
