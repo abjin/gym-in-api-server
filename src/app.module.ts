@@ -10,6 +10,7 @@ import { FeedsModule } from './feeds/feeds.module';
 import { ChallengesModule } from './challenges/challenges.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { LevelsModule } from './levels/levels.module';
+import { RankingsModule } from './rankings/rankings.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { LevelsModule } from './levels/levels.module';
     ChallengesModule,
     AttendancesModule,
     LevelsModule,
+    RankingsModule,
   ],
   controllers: [AppController],
 })

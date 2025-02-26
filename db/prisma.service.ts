@@ -1,7 +1,7 @@
 import { DateService } from '@libs/date';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Users } from '@prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -36,11 +36,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     author: true,
   };
 
-  get currentChallengeCondition() {
-    const today = new Date(DateService.getDateString());
-    return { startDate: { lte: today }, endDate: { gte: today } };
-  }
-
   public readonly challengeSelect = {
     id: true,
     name: true,
@@ -58,4 +53,29 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     createdAt: true,
     exercises: true,
   };
+
+  get currentChallengeCondition() {
+    const today = new Date(DateService.getDateString());
+    return { startDate: { lte: today }, endDate: { gte: today } };
+  }
+
+  async addUserToArray<T extends { userId?: string; owner?: string }>(
+    data: T[],
+  ): Promise<(T & { user: Users | null })[]> {
+    const userIds = data.map((item) => item.userId || item.owner);
+
+    if (userIds.length === 0)
+      return data.map((item) => ({ ...item, user: null }));
+
+    const users = await this.users.findMany({ where: { id: { in: userIds } } });
+
+    const userMap = new Map(users.map((user) => [user.id, user]));
+
+    const updatedData = data.map((item) => ({
+      ...item,
+      user: userMap.get(item.userId || item.owner),
+    }));
+
+    return updatedData;
+  }
 }
