@@ -29,6 +29,6 @@ export class RankingsController {
   @ApiResponse({ type: RankingDto })
   async getUserRanking(@RequestUser() user: Users): Promise<RankingDto> {
     const result = await this.rankingsService.getUserRanking(user.id);
-    return new RankingDto(result);
+    return result ? new RankingDto(result) : null;
   }
 }
