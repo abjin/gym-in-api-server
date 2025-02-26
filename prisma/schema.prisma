@@ -160,11 +160,12 @@ model AttendanceGoals {
 }
 
 model LevelLogs {
-  id        Int           @id @default(autoincrement())
-  userId    String
-  amount    Int
-  type      LevelLogType?
-  createdAt DateTime      @default(now())
+  id          Int           @id @default(autoincrement())
+  userId      String
+  amount      Int
+  type        LevelLogType?
+  description String?
+  createdAt   DateTime      @default(now())
 
   user Users @relation("userToLevelLog", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 

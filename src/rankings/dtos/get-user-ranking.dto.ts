@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Users } from '@prisma/client';
+import { UserDto } from 'src/users/dtos/user.dto';
 
 export class GetUserRankingResponseDto {
   @ApiProperty({ description: '사용자 ID', type: String })
@@ -11,6 +11,6 @@ export class GetUserRankingResponseDto {
   @ApiProperty({ description: '랭킹', type: Number })
   rank: number;
 
-  @ApiProperty({ description: '사용자 정보', type: Users })
-  user: Users;
+  @ApiProperty({ description: '사용자 정보', type: UserDto })
+  user: UserDto;
 }

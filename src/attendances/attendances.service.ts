@@ -12,6 +12,10 @@ import { S3Service } from '@libs/s3';
 import { OpenrouterService } from '@libs/openrouter';
 import { DateService } from '@libs/date';
 import { $Enums } from '@prisma/client';
+import { RankingsService } from 'src/rankings/rankings.service';
+import { ExperiencePointValue, RankingScoreWeight } from 'src/constants';
+import { IncreaseAttendanceRankingScoreParams } from '@types';
+import { LevelsService } from 'src/levels/levels.service';
 
 @Injectable()
 export class AttendancesService {
@@ -19,6 +23,8 @@ export class AttendancesService {
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
     private readonly openrouterService: OpenrouterService,
+    private readonly rankingsService: RankingsService,
+    private readonly levelsService: LevelsService,
   ) {}
 
   getPreSignedUrls(userId: string, count = 1) {
@@ -53,13 +59,76 @@ export class AttendancesService {
     owner: string,
     body: CreateAttendanceRequestDto,
   ): Promise<AttendanceResponseDto> {
-    return await this.prismaService.attendances.create({
+    const result = await this.prismaService.attendances.create({
       select: this.prismaService.attendanceSelect,
       data: {
         owner,
         date: new Date(body.date),
         exercises: { create: body.exercises.map((type) => ({ type })) },
       },
+    });
+
+    const attendanceGoal = await this.getAttendanceGoals({ owner });
+    const successCount = await this.getAttendanceGoalSuccessCount(owner);
+    const isGoalAchieved = attendanceGoal.goal === successCount;
+
+    Promise.all([
+      this.increaseAttendaceExperiencePoint(owner, isGoalAchieved),
+      this.increaseAttendanceRankingScore({
+        owner,
+        isGoalAchieved,
+        successCount,
+      }),
+    ]).catch(console.log);
+
+    return result;
+  }
+
+  private async increaseAttendanceRankingScore({
+    owner,
+    isGoalAchieved,
+    successCount,
+  }: IncreaseAttendanceRankingScoreParams) {
+    let score = RankingScoreWeight.ATTENDANCE * 1;
+    if (isGoalAchieved) {
+      score += RankingScoreWeight.ATTENDANCE_GOAL * successCount;
+    }
+    await this.rankingsService.increaseRankingScore(owner, score);
+  }
+
+  private async increaseAttendaceExperiencePoint(
+    owner: string,
+    isGoalAchieved: boolean,
+  ) {
+    const promises = [
+      this.levelsService.increaseExperiencePoint({
+        userId: owner,
+        amount: ExperiencePointValue.ATTENDANCE,
+        type: $Enums.LevelLogType.attendance,
+      }),
+    ];
+
+    if (isGoalAchieved) {
+      promises.push(
+        this.levelsService.increaseExperiencePoint({
+          userId: owner,
+          amount: ExperiencePointValue.ATTENDANCE_GOAL,
+          type: $Enums.LevelLogType.attendanceGoal,
+        }),
+      );
+    }
+
+    await Promise.all(promises);
+  }
+
+  async getAttendanceGoalSuccessCount(
+    owner: string,
+    type = $Enums.AttendanceGoalType.weekly,
+  ) {
+    const range = await this.getAttendanceGoalRange(type);
+
+    return this.prismaService.attendances.count({
+      where: { owner, date: { gte: range.startDate, lte: range.endDate } },
     });
   }
 
@@ -86,7 +155,7 @@ export class AttendancesService {
 
   private async getAttendanceGoalRange(
     type: $Enums.AttendanceGoalType,
-    date: string,
+    date = DateService.getDateString({ format: 'YYYY-MM-DD' }),
   ): Promise<{ startDate: Date; endDate: Date }> {
     let startDate: Date;
     let endDate: Date;
@@ -126,12 +195,12 @@ export class AttendancesService {
 
   async getAttendanceGoals({
     owner,
-    type,
-    date,
+    type = $Enums.AttendanceGoalType.weekly,
+    date = DateService.getDateString({ format: 'YYYY-MM-DD' }),
   }: {
     owner: string;
-    type: $Enums.AttendanceGoalType;
-    date: string;
+    type?: $Enums.AttendanceGoalType;
+    date?: string;
   }): Promise<AttendanceGoalResponseDto> {
     const range = await this.getAttendanceGoalRange(type, date);
     return this.prismaService.attendanceGoals.findUnique({

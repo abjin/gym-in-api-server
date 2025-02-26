@@ -2,15 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'db/prisma.service';
 import { AvailableChallenge, ChallengeReward } from './dtos/get-challenges.dto';
 import {
+  $Enums,
   ChallengeCertificationLogs,
   ChallengeParticipants,
   ChallengeRewards,
 } from '@prisma/client';
 import { DateService } from '@libs/date';
+import { LevelsService } from 'src/levels/levels.service';
 
 @Injectable()
 export class ChallengesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly levelsService: LevelsService,
+  ) {}
 
   async getAvailableChallenges(userId: string): Promise<AvailableChallenge[]> {
     const challenges = await this.prisma.challenges.findMany({
@@ -102,14 +107,17 @@ export class ChallengesService {
       const query = this.updateChallengeCertificationQueryBuilder(participant);
       if (!query) return null;
 
-      const result = await this.prisma.challengeParticipants.update(query);
-      participant = Object.assign(participant, result);
-      if (participant.rewardedAt || !participant.status) return participant;
+      const updatedParticipant =
+        await this.prisma.challengeParticipants.update(query);
 
-      const rewards = participant.challenge.rewards;
-      const goalDays = participant.goalDays;
+      const areRewardsGiven = updatedParticipant.rewardedAt;
+      const isChallengeFailed = !updatedParticipant.status;
+      if (areRewardsGiven || isChallengeFailed) return updatedParticipant;
+
+      const rewards = updatedParticipant.challenge.rewards;
+      const goalDays = updatedParticipant.goalDays;
       await this.giveChallegeRewards({ userId, rewards, goalDays });
-      return participant;
+      return updatedParticipant;
     });
 
     return Promise.all(promises).then((results) => results.filter((r) => !!r));
@@ -142,6 +150,7 @@ export class ChallengesService {
     const updatedAt = new Date();
     const date = new Date(DateService.getDateString());
 
+    const include = { challenge: { include: { rewards: true } } };
     const where = { participantId: participant.participantId };
     const data = {
       status: participant.goalDays <= successDays,
@@ -150,11 +159,10 @@ export class ChallengesService {
       certificationLogs: { create: { userId: participant.userId, date } },
     };
 
-    return { where, data };
+    return { where, data, include };
   }
 
   async giveChallegeRewards({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId,
     rewards,
     goalDays,
@@ -173,7 +181,11 @@ export class ChallengesService {
 
     if (!maxReward) return maxReward;
 
-    // TODO: Implement reward giving logic
+    await this.levelsService.increaseExperiencePoint({
+      userId,
+      amount: maxReward.amount,
+      type: $Enums.LevelLogType.challenge,
+    });
 
     await this.prisma.challengeParticipants.update({
       where: {

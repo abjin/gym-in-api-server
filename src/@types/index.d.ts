@@ -10,3 +10,11 @@ export type KakaoGetUserProfileApiResponse = {
 };
 
 export type JwtPayload = { id: string };
+
+export type IncreaseAttendanceRankingScoreParams = {
+  owner: string;
+  isGoalAchieved: boolean;
+  successCount: number;
+};
+
+};
