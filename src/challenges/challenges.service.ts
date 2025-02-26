@@ -171,7 +171,7 @@ export class ChallengesService {
     rewards: ChallengeRewards[];
     goalDays: number;
   }) {
-    let maxReward = null;
+    let maxReward: ChallengeRewards | null = null;
 
     rewards.forEach((r) => {
       const canReceiveReward = r.days <= goalDays;

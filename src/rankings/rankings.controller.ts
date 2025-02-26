@@ -4,11 +4,7 @@ import { Users } from '@prisma/client';
 import { RequestUser } from 'src/user.decorator';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import {
-  GetRankingsRequestDto,
-  GetRankingsResponseDto,
-  GetUserRankingResponseDto,
-} from './dtos';
+import { GetRankingsRequestDto, RankingDto } from './dtos';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -18,20 +14,20 @@ export class RankingsController {
 
   @Get()
   @ApiOperation({ summary: 'get rankings' })
-  @ApiResponse({ type: GetRankingsResponseDto })
+  @ApiResponse({ type: RankingDto, isArray: true })
   async getRankings(
     @Query() { start, end }: GetRankingsRequestDto,
-  ): Promise<GetRankingsResponseDto> {
-    const data = await this.rankingsService.getRankings(start, end);
-    return { data };
+  ): Promise<RankingDto[]> {
+    const result = await this.rankingsService.getRankings(start, end);
+
+    return result.map((item) => new RankingDto(item));
   }
 
   @Get('my')
   @ApiOperation({ summary: 'get my ranking' })
-  @ApiResponse({ type: GetUserRankingResponseDto })
-  getUserRanking(
-    @RequestUser() user: Users,
-  ): Promise<GetUserRankingResponseDto | null> {
-    return this.rankingsService.getUserRanking(user.id);
+  @ApiResponse({ type: RankingDto })
+  async getUserRanking(@RequestUser() user: Users): Promise<RankingDto> {
+    const result = await this.rankingsService.getUserRanking(user.id);
+    return new RankingDto(result);
   }
 }

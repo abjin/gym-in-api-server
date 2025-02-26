@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { IsInt, IsOptional, Min } from 'class-validator';
 
 export class GetRankingsRequestDto {
@@ -28,24 +28,40 @@ export class GetRankingsRequestDto {
   end?: number = 9;
 }
 
-export class RankingUserDto {
-  @ApiProperty({ description: '사용자 ID', type: String })
+@Exclude()
+class RankingUserDto {
+  @Expose()
+  @ApiProperty({ description: '유저 아이디', type: String })
   id: string;
 
-  @ApiProperty({ description: '사용자 이름', type: String })
-  name: string;
+  @Expose()
+  @ApiProperty({ description: '닉네임', type: String })
+  nickname: string;
 
-  @ApiProperty({
-    description: '사용자 프로필 이미지',
-    type: String,
-    nullable: true,
-  })
-  profileImage: string | null;
+  @Expose()
+  @ApiProperty({ description: '프로필 이미지 URL', type: String })
+  profileImageUrl: string;
 
-  // 필요한 다른 사용자 속성들을 추가할 수 있습니다
+  @ApiProperty({ description: '경험치', type: Number })
+  @Expose()
+  @Transform(({ obj }) => obj.totalExperiencePoint % 100)
+  experiencePoint: number;
+
+  @ApiProperty({ description: '레벨', type: Number })
+  @Expose()
+  @Transform(({ obj }) => Math.floor(obj.totalExperiencePoint / 100))
+  level: number;
+
+  @Exclude()
+  @ApiProperty({ description: '경험치', type: Number })
+  totalExperiencePoint: number;
+
+  constructor(partial: Partial<RankingUserDto>) {
+    Object.assign(this, partial);
+  }
 }
 
-export class RankingItemDto {
+export class RankingDto {
   @ApiProperty({ description: '사용자 ID', type: String })
   userId: string;
 
@@ -55,14 +71,11 @@ export class RankingItemDto {
   @ApiProperty({ description: '랭킹', type: Number })
   rank: number;
 
+  @Type(() => RankingUserDto)
   @ApiProperty({ description: '사용자 정보', type: RankingUserDto })
-  user: RankingUserDto;
-}
+  user: Partial<RankingUserDto>;
 
-export class GetRankingsResponseDto {
-  @ApiProperty({
-    description: '랭킹 목록',
-    type: [RankingItemDto],
-  })
-  data: RankingItemDto[];
+  constructor(partial: Partial<RankingDto>) {
+    Object.assign(this, partial);
+  }
 }

@@ -32,7 +32,10 @@ export class LevelsService {
       .catch(console.log);
 
     this.rankingsService
-      .increaseRankingScore(userId, RankingScoreWeight.EXPERIENCE_POINT * 1)
+      .increaseRankingScore(
+        userId,
+        RankingScoreWeight.EXPERIENCE_POINT * amount,
+      )
       .catch(console.log);
 
     return result;
