@@ -19,7 +19,9 @@ export class RankingsController {
     @Query() { start, end }: GetRankingsRequestDto,
   ): Promise<RankingDto[]> {
     const result = await this.rankingsService.getRankings(start, end);
-    return result.map((item) => new RankingDto(item));
+    return result
+      .filter((item) => !!item.user)
+      .map((item) => new RankingDto(item));
   }
 
   @Get('my')
