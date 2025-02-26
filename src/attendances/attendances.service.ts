@@ -70,7 +70,8 @@ export class AttendancesService {
 
     const attendanceGoal = await this.getAttendanceGoals({ owner });
     const successCount = await this.getAttendanceGoalSuccessCount(owner);
-    const isGoalAchieved = attendanceGoal.goal === successCount;
+    const isGoalAchieved =
+      attendanceGoal && attendanceGoal.goal === successCount;
 
     Promise.all([
       this.increaseAttendaceExperiencePoint(owner, isGoalAchieved),
