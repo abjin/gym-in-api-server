@@ -33,6 +33,8 @@ async function bootstrap() {
     'https://gym-in-korea.web.app',
     'https://gym-in-korea.firebaseapp.com',
     'http://gym-in-korea.firebaseapp.com',
+    'https://gym-in.net',
+    'http://gym-in.net',
   ];
 
   app.enableCors({
