@@ -245,3 +245,89 @@ KAKAO_CLIENT_SECRET=your-kakao-client-secret
 - **S3Module**: AWS S3 이미지 업로드
 - **OpenrouterModule**: AI 이미지 검증
 - **DateModule**: 날짜 유틸리티
+
+## 🤖 프롬프트 엔지니어링
+
+이 프로젝트는 OpenRouter AI를 활용하여 헬스장 이미지 검증 기능을 구현합니다. AI 모델과의 효과적인 상호작용을 위해 정교한 프롬프트 엔지니어링 기법을 적용했습니다.
+
+### 이미지 검증 시스템
+
+#### 사용 모델
+- **모델**: `google/gemini-flash-1.5-8b`
+- **목적**: 실제 운영 중인 헬스장 이미지 판별
+- **응답 형식**: JSON (`{result: true/false}`)
+
+#### 프롬프트 구조
+
+```typescript
+// 시스템 프롬프트 (역할 정의)
+const systemPrompt = `
+You are an AI that analyzes images to determine if they show a real, 
+physical gym or fitness center currently in operation. 
+Photos of gyms or drawings/illustrations of gyms should return {result: false}. 
+Only return {result: true} if the image shows a real, operating gym or 
+fitness center in its actual physical space. 
+Respond with JSON format {result: true/false}.
+`;
+
+// 사용자 프롬프트 (구체적 질문)
+const userPrompt = `
+Is this image showing a real, operating gym (not a photo or drawing of a gym)?
+`;
+```
+
+#### 프롬프트 설계 원칙
+
+1. **명확한 역할 정의**
+   - AI의 역할을 "헬스장 이미지 분석 전문가"로 구체적으로 명시
+   - 분석 목적과 기준을 명확하게 제시
+
+2. **구체적인 판별 기준**
+   - ✅ 실제 운영 중인 헬스장 → `true`
+   - ❌ 헬스장 사진의 사진 → `false`
+   - ❌ 헬스장 그림/일러스트 → `false`
+
+3. **구조화된 응답 형식**
+   - JSON 형태로 일관된 응답 요구
+   - `response_format: { type: 'json_object' }` 설정
+
+4. **멀티모달 입력**
+   - 이미지 URL과 텍스트 질문을 함께 전송
+   - 시각적 정보와 언어적 지시사항의 조합
+
+### 프롬프트 최적화 전략
+
+#### 1. 반복적 개선
+```typescript
+// 초기 프롬프트 (모호함)
+"Is this a gym image?"
+
+// 개선된 프롬프트 (구체적)
+"Is this image showing a real, operating gym (not a photo or drawing of a gym)?"
+```
+
+#### 2. 예외 상황 처리
+- 사진 속 사진 구별
+- 일러스트/그림 구별
+- 폐업한 헬스장 구별
+
+#### 3. 일관성 확보
+- 동일한 시스템 프롬프트 재사용
+- 표준화된 응답 형식
+- 명확한 판별 기준
+
+### 활용 사례
+
+#### 체크인 이미지 검증
+```typescript
+// 사용자가 헬스장 체크인 시 이미지 업로드
+const isValidGymImage = await openrouterService.validateGymImage(imageUrl);
+
+if (isValidGymImage.result) {
+  // 유효한 헬스장 이미지 - 체크인 허용
+  await attendanceService.checkIn(userId, imageUrl);
+} else {
+  // 잘못된 이미지 - 체크인 거부
+  throw new BadRequestException('올바른 헬스장 이미지를 업로드해주세요.');
+}
+```
